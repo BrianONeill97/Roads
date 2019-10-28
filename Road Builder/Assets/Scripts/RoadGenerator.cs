@@ -4,66 +4,63 @@ using UnityEngine;
 
 public class RoadGenerator : MonoBehaviour
 {
-    public int Max_Column = 0;
-    public int Max_Row = 0;
+    public int MAX_ROADS = 0;
+
+    public int padding;
+    int j = 0;
+
+    public int turn;
+    public int turnTwo;
+    public int turnThree;
 
     List<GameObject> roadSys = new List<GameObject>();
 
+    //public GameObject corner;
+    public GameObject VerticalRoad;
     public GameObject corner;
-    public GameObject road;
-    private GameObject lastPart;
-
-
-    public Vector3 spacing;
+    private Vector3 pos;
     private Quaternion rot;
 
-    int next = 0;
     // Start is called before the first frame update
 
-    void Awake()
-    {
-        for(int i = 0; i < Max_Column; i ++)
-        {
-            next = Random.Range(0, 100);
-            if(next < 50)
-            {
-                if (lastPart == corner)
-                {
-                    roadSys.Add(road);
-                    //roadSys[i].transform.RotateAround((90, 0, 0);
-                    lastPart = road;
-                }
-                else
-                {
-                    roadSys.Add(road);
-                    lastPart = road;
-                }
-            }
-
-            if (next > 50)
-            {
-                if (lastPart == corner)
-                {
-                    roadSys.Add(road);
-                   // roadSys[i].transform.RotateAround(90, 0, 0);
-                    lastPart = road;
-                }
-                else
-                {
-                    roadSys.Add(corner);
-                    lastPart = corner;
-                }
-            }
-            next = 0;
-
-        }
-    }
     void Start()
     {
-        for (int i = 0; i < Max_Column; i++)
+        for (int i = 0; i < MAX_ROADS; i++)
         {
-            Instantiate(roadSys[i], roadSys[i].transform.position + (spacing * i), roadSys[i].transform.rotation);
-        }
+            roadSys.Add(VerticalRoad);
 
+            //When You are any turn the replace the object in the list with a corner object
+            if (i == turn || i == turnTwo || i == turnThree)
+            {
+                roadSys[i] = corner;
+                //rot = Quaternion.AngleAxis(90, Vector3.up);
+            }
+
+            //Right side of square 
+            if (i <= turn)
+            {             
+                pos = new Vector3(i * padding, pos.y, pos.z);
+
+            }
+            //Top of Square
+            if (i > turn && i <= turnTwo)
+            {
+                j++;
+                pos = new Vector3(pos.x, pos.y, j * padding);
+            }
+            //Left side
+            if (i > turnTwo && i <= turnThree)
+            {
+                pos = new Vector3(pos.x = pos.x + -padding, pos.y, pos.z);
+            }
+            //Bottom side
+            if (i > turnThree)
+            {
+                pos = new Vector3(pos.x, pos.y, pos.z = pos.z + -padding);
+            }
+
+            //Creates the Pattern
+            Instantiate(roadSys[i], pos, rot);
+        }
     }
 }
