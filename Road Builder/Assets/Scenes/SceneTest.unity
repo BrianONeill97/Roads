@@ -205,12 +205,12 @@ GameObject:
   - component: {fileID: 813732537}
   - component: {fileID: 813732536}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: RoadSys
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &813732536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,14 +223,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a079c3536125484c8bed584c7009d8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MAX_ROADS: 20
-  padding: 3
-  turn: 5
-  turnTwo: 10
-  turnThree: 15
-  VerticalRoad: {fileID: 3297292106490270899, guid: 09d5398ff3bf78048b9b71e85b8d07cb,
+  MAX_ROADS: 40
+  turn: 9
+  turnTwo: 19
+  turnThree: 29
+  turnFour: 39
+  VerticalRoad: {fileID: 7449777264715579781, guid: f307dddc017d4484a9acabbe4871f8a7,
     type: 3}
-  corner: {fileID: 6449261570673531195, guid: 2d76e884227a28d47bfe640a0adce497, type: 3}
+  cornerPiece: {fileID: 6493874929061757779, guid: 6317514d39172af4aac700fd17ca9376,
+    type: 3}
+  Tree: {fileID: 6260301720184990838, guid: d0d2679f7cac5764b9f5859684fd8916, type: 3}
 --- !u!4 &813732537
 Transform:
   m_ObjectHideFlags: 0
@@ -244,6 +246,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1388790737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1388790739}
+  - component: {fileID: 1388790738}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1388790738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1388790737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2566e6945dfb5b54cb7b7c6a1173907e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MAX_ROADS: 20
+  turn: 2
+  turnTwo: 5
+  turnThree: 10
+  turnFour: 16
+  Road: {fileID: 8091786348225403417, guid: 09d5398ff3bf78048b9b71e85b8d07cb, type: 3}
+  cornerPiece: {fileID: 5816448693193913281, guid: 1801701eb3ab7fc469e0d6e907b598e9,
+    type: 3}
+  Tree: {fileID: 6260301720184990838, guid: d0d2679f7cac5764b9f5859684fd8916, type: 3}
+--- !u!4 &1388790739
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1388790737}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.659195, y: -30.118221, z: -12.945765}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1542661745
 GameObject:

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class RoadGenerator : MonoBehaviour
+public class TestGen : MonoBehaviour
 {
     public int MAX_ROADS = 0;
 
@@ -15,9 +16,8 @@ public class RoadGenerator : MonoBehaviour
     bool offsetCornerTwo = true;
     bool offsetCornerThree = true;
 
-
     //public GameObject corner;
-    public GameObject VerticalRoad;
+    public GameObject Road;
     public GameObject cornerPiece;
     public GameObject Tree;
     private Vector3 pos;
@@ -26,9 +26,8 @@ public class RoadGenerator : MonoBehaviour
     // Start is called before the first frame update
 
     void Start()
-    {
-        GetSize(Tree);
-        GenerateBlock(VerticalRoad, cornerPiece);
+    {    
+        GenerateBlock(Road, cornerPiece);
     }
 
     void GenerateBlock(GameObject road, GameObject corner)
@@ -87,7 +86,7 @@ public class RoadGenerator : MonoBehaviour
 
 
             //Creates the roads after position and rotation calculations
-            if (i == turn || i == turnTwo || i == turnThree || i == turnFour)
+            if (i == turn || i == turnTwo || i == turnThree || i == (MAX_ROADS - 1))
             {
                 if (i == turnTwo)
                 {
@@ -98,10 +97,10 @@ public class RoadGenerator : MonoBehaviour
                     ChangeRotation(transform, 180);
                     //offset to fix rotations
                     //Needs to be done to fix the bottom right corner
-                    Offset(GetSize(cornerPiece).x, 0, GetSize(cornerPiece).z, false);
+                    Offset(GetSize(cornerPiece).x, 0, GetSize(cornerPiece).z,false);
 
                 }
-                if (i == turnFour)
+                if (i == (MAX_ROADS - 1))
                 {
                     ChangeRotation(transform, 270);
                 }
