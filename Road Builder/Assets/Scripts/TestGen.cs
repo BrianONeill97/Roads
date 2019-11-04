@@ -10,34 +10,37 @@ using System;
 
 public class TestGen : MonoBehaviour
 {
+    //Maximum Roads
     public int MAX_ROADS = 0;
 
+    //For Turns
     public List<int> Turn;
-
     public int turn;
     public int turnTwo;
     public int turnThree;
     public int turnFour;
 
-    bool offsetCornerOne = true;
-    bool offsetCornerTwo = true;
-    bool offsetCornerThree = true;
-
-    //public GameObject corner;
+    //Game Objects
     public GameObject Road;
     public GameObject cornerPiece;
     public GameObject Tree;
     public GameObject plainTile;
     List<GameObject> RoadTiles = new List<GameObject>();
+
+    //For Placing and rotating
     private Vector3 pos;
     Quaternion rot;
     bool isClosed = false;
+    bool offsetCornerOne = true;
+    bool offsetCornerTwo = true;
+    bool offsetCornerThree = true;
 
     // Start is called before the first frame update
 
     void Start()
     {
         GenerateBlock(Road, cornerPiece);
+
         if (isClosed)
         {
             GenerateCentre();
@@ -145,10 +148,14 @@ public class TestGen : MonoBehaviour
 
     void GenerateCentre()
     {
-        Vector3 bottomLeftCorner = new Vector3(GetSize(RoadTiles[0]).x,0, GetSize(RoadTiles[0]).z);
-        int TopLeftTile = (MAX_ROADS / 4) - 1;
-        Vector3 z = new Vector3(RoadTiles[TopLeftTile].transform.position.x, 0, GetSize(RoadTiles[TopLeftTile]).z); // Used for both 
-        float zCount = (GetDistanceBetween(bottomLeftCorner, z) / GetSize(plainTile).z);   
+        int TopLeftTile = (MAX_ROADS / 4) - 1; // get the first tile corner
+        int TopRightCorner = ((MAX_ROADS / 4) * 2) - 1;
+
+        Vector3 bottomLeftCornerOfCentre = new Vector3(GetSize(RoadTiles[0]).x,0, GetSize(RoadTiles[0]).z); // Bottom left corner of centre
+        Vector3 topLeftPosCentre = new Vector3(RoadTiles[TopLeftTile].transform.position.x, 0, GetSize(RoadTiles[TopLeftTile]).z); //Gets the First turn postion so top left of the centre 
+        Vector3 topRightPosCentre = new Vector3(RoadTiles[TopRightCorner].transform.position.x, 0, RoadTiles[TopRightCorner].transform.position.z); // Gets the top right corner of the centre square
+
+        float zCount = (GetDistanceBetween(bottomLeftCornerOfCentre, topLeftPosCentre) / GetSize(plainTile).z);   
         float xCount = zCount;
 
 
@@ -156,7 +163,14 @@ public class TestGen : MonoBehaviour
         {
             for (int j = 0; j < zCount; j++)
             {
-                Instantiate(plainTile, new Vector3(bottomLeftCorner.x + (i * GetSize(plainTile).x), 0, -bottomLeftCorner.z - (j * GetSize(plainTile).z)), Quaternion.identity);
+               Instantiate(plainTile, new Vector3(bottomLeftCornerOfCentre.x + (i * GetSize(plainTile).x), 0, -bottomLeftCornerOfCentre.z - (j * GetSize(plainTile).z)), Quaternion.identity);
+                Vector3 positionForTrees = new Vector3(
+                    UnityEngine.Random.Range(bottomLeftCornerOfCentre.x - GetSize(plainTile).x, topLeftPosCentre.x - GetSize(plainTile).x),
+                    0, 
+                    UnityEngine.Random.Range(topLeftPosCentre.z - (GetSize(plainTile).z * 2), topRightPosCentre.z + GetSize(plainTile).z)
+                    );
+
+               GenerateTrees(positionForTrees, transform);
             }
         }
 
