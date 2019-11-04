@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+// ToDo:
+// Make it so more roads can be added
+// Fill in centre if the road is closed with tiles and populate trees on them
+// Maybe fix Parenting issue
+
 public class TestGen : MonoBehaviour
 {
     public int MAX_ROADS = 0;
+
+    public List<int> Turn;
 
     public int turn;
     public int turnTwo;
@@ -20,14 +27,21 @@ public class TestGen : MonoBehaviour
     public GameObject Road;
     public GameObject cornerPiece;
     public GameObject Tree;
+    public GameObject plainTile;
+    List<GameObject> RoadTiles = new List<GameObject>();
     private Vector3 pos;
     Quaternion rot;
+    bool isClosed = false;
 
     // Start is called before the first frame update
 
     void Start()
-    {    
+    {
         GenerateBlock(Road, cornerPiece);
+        if (isClosed)
+        {
+            GenerateCentre();
+        }
     }
 
     void GenerateBlock(GameObject road, GameObject corner)
@@ -105,12 +119,21 @@ public class TestGen : MonoBehaviour
                     ChangeRotation(transform, 270);
                 }
 
-                Instantiate(corner, pos, transform.rotation);
+                RoadTiles.Add(Instantiate(corner, transform.position, transform.rotation));
                 GenerateTrees(pos, transform);
             }
             else
             {
-                Instantiate(road, pos, transform.rotation);
+                 RoadTiles.Add(Instantiate(road, transform.position, transform.rotation) as GameObject);
+            }
+
+            if (i == (MAX_ROADS - 1))
+            {
+                if (GetDistanceBetween(RoadTiles[0].transform.position, RoadTiles[MAX_ROADS - 1].transform.position) <= (GetSize(cornerPiece).z * 2))
+                {
+                    isClosed = true;
+                    
+                }
             }
         }
     }
@@ -118,6 +141,27 @@ public class TestGen : MonoBehaviour
     void GenerateTrees(Vector3 t, Transform rot)
     {
         Instantiate(Tree, t, rot.rotation);
+    }
+
+    void GenerateCentre()
+    {
+        Vector3 bottomLeftCorner = new Vector3(GetSize(RoadTiles[0]).x,0, GetSize(RoadTiles[0]).z);
+        int TopLeftTile = (MAX_ROADS / 4) - 1;
+        Vector3 z = new Vector3(RoadTiles[TopLeftTile].transform.position.x, 0, GetSize(RoadTiles[TopLeftTile]).z); // Used for both 
+        float zCount = (GetDistanceBetween(bottomLeftCorner, z) / GetSize(plainTile).z);   
+        float xCount = zCount;
+
+
+        for (int i = 0; i < xCount; i++)
+        {
+            for (int j = 0; j < zCount; j++)
+            {
+                Instantiate(plainTile, new Vector3(bottomLeftCorner.x + (i * GetSize(plainTile).x), 0, -bottomLeftCorner.z - (j * GetSize(plainTile).z)), Quaternion.identity);
+            }
+        }
+
+        isClosed = false;
+
     }
 
     Vector3 GetSize(GameObject obj)
@@ -133,7 +177,8 @@ public class TestGen : MonoBehaviour
     Quaternion ChangeRotation(Transform rot, int change)
     {
         rot.rotation = Quaternion.Euler(0, change, 0);
-        return rot.rotation;
+        transform.rotation = rot.rotation;
+        return transform.rotation;
     }
 
     Vector3 Offset(float xOff, float yOff, float zOff, bool positiveOffset)
@@ -146,6 +191,13 @@ public class TestGen : MonoBehaviour
         {
             pos = new Vector3(pos.x - xOff, 0 - yOff, pos.z - zOff);
         }
-        return pos;
+        transform.position = pos;
+        return transform.position;
+    }
+
+    float GetDistanceBetween(Vector3 first, Vector3 second)
+    {
+        float dist = Vector3.Distance(first, second);
+        return dist;
     }
 }
