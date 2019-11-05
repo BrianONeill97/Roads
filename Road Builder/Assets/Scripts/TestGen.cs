@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+
 // ToDo:
 // Make it so more roads can be added
-// Fill in centre if the road is closed with tiles and populate trees on them
+// Fill in centre if the road is closed with tiles and populate trees on them (DONE)
+//Check if objects are inside each other.
+//Add in more roads tiles.
 // Maybe fix Parenting issue
 
 public class TestGen : MonoBehaviour
@@ -24,6 +27,8 @@ public class TestGen : MonoBehaviour
     public GameObject Road;
     public GameObject cornerPiece;
     public GameObject Tree;
+    public GameObject stump;
+
     public GameObject plainTile;
     List<GameObject> RoadTiles = new List<GameObject>();
 
@@ -39,6 +44,10 @@ public class TestGen : MonoBehaviour
 
     void Start()
     {
+        #if UNITY_EDITOR
+        UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
+        #endif
+
         GenerateBlock(Road, cornerPiece);
 
         if (isClosed)
@@ -103,7 +112,7 @@ public class TestGen : MonoBehaviour
 
 
             //Creates the roads after position and rotation calculations
-            if (i == turn || i == turnTwo || i == turnThree || i == (MAX_ROADS - 1))
+            if (i == turn || i == turnTwo || i == turnThree || i == turnFour)
             {
                 if (i == turnTwo)
                 {
@@ -121,9 +130,7 @@ public class TestGen : MonoBehaviour
                 {
                     ChangeRotation(transform, 270);
                 }
-
                 RoadTiles.Add(Instantiate(corner, transform.position, transform.rotation));
-                GenerateTrees(pos, transform);
             }
             else
             {
@@ -141,9 +148,9 @@ public class TestGen : MonoBehaviour
         }
     }
 
-    void GenerateTrees(Vector3 t, Transform rot)
+    void Generate(GameObject obj,Vector3 t, Transform rot)
     {
-        Instantiate(Tree, t, rot.rotation);
+        Instantiate(obj, t, rot.rotation);
     }
 
     void GenerateCentre()
@@ -155,7 +162,7 @@ public class TestGen : MonoBehaviour
         Vector3 topLeftPosCentre = new Vector3(RoadTiles[TopLeftTile].transform.position.x, 0, GetSize(RoadTiles[TopLeftTile]).z); //Gets the First turn postion so top left of the centre 
         Vector3 topRightPosCentre = new Vector3(RoadTiles[TopRightCorner].transform.position.x, 0, RoadTiles[TopRightCorner].transform.position.z); // Gets the top right corner of the centre square
 
-        float zCount = (GetDistanceBetween(bottomLeftCornerOfCentre, topLeftPosCentre) / GetSize(plainTile).z);   
+        float zCount = Mathf.Floor((GetDistanceBetween(bottomLeftCornerOfCentre, topLeftPosCentre) / GetSize(plainTile).z));   
         float xCount = zCount;
 
 
@@ -166,11 +173,18 @@ public class TestGen : MonoBehaviour
                Instantiate(plainTile, new Vector3(bottomLeftCornerOfCentre.x + (i * GetSize(plainTile).x), 0, -bottomLeftCornerOfCentre.z - (j * GetSize(plainTile).z)), Quaternion.identity);
                 Vector3 positionForTrees = new Vector3(
                     UnityEngine.Random.Range(bottomLeftCornerOfCentre.x - GetSize(plainTile).x, topLeftPosCentre.x - GetSize(plainTile).x),
-                    0, 
+                    GetSize(plainTile).y, 
+                    UnityEngine.Random.Range(topLeftPosCentre.z - (GetSize(plainTile).z * 2), topRightPosCentre.z + GetSize(plainTile).z)
+                    );
+                Vector3 positionForStump = new Vector3(
+                    UnityEngine.Random.Range(bottomLeftCornerOfCentre.x - GetSize(plainTile).x, topLeftPosCentre.x - GetSize(plainTile).x),
+                   GetSize(plainTile).y,
                     UnityEngine.Random.Range(topLeftPosCentre.z - (GetSize(plainTile).z * 2), topRightPosCentre.z + GetSize(plainTile).z)
                     );
 
-               GenerateTrees(positionForTrees, transform);
+               Generate(Tree,positionForTrees, transform);
+               Generate(stump, positionForStump, transform);
+
             }
         }
 

@@ -276,16 +276,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2566e6945dfb5b54cb7b7c6a1173907e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MAX_ROADS: 40
-  Turn: 
-  turn: 9
-  turnTwo: 19
-  turnThree: 29
-  turnFour: 39
+  MAX_ROADS: 20
+  Turn: 04000000090000000e0000001300000013000000130000001300000013000000
+  turn: 4
+  turnTwo: 9
+  turnThree: 14
+  turnFour: 19
   Road: {fileID: 8091786348225403417, guid: 09d5398ff3bf78048b9b71e85b8d07cb, type: 3}
   cornerPiece: {fileID: 5816448693193913281, guid: 1801701eb3ab7fc469e0d6e907b598e9,
     type: 3}
-  Tree: {fileID: 6260301720184990838, guid: d0d2679f7cac5764b9f5859684fd8916, type: 3}
+  Tree: {fileID: 100000, guid: e7ba6850887ae694a970af5f171fa6d5, type: 3}
+  stump: {fileID: 1656226002977108, guid: e191e21fcb275784a9f8b6d08dcd932c, type: 3}
   plainTile: {fileID: 3800143526618120163, guid: 319d3d4f14f155744b441b30c2fc7731,
     type: 3}
 --- !u!4 &1388790739
