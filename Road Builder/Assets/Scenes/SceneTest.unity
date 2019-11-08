@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MAX_ROADS: 20
-  Turn: 04000000090000000e0000001300000013000000130000001300000013000000
+  Turn: 
   turn: 4
   turnTwo: 9
   turnThree: 14
