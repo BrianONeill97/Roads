@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e62d68e5e089474449ec9dbc2a394a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cube: {fileID: 2528205317606780610, guid: df52dd0a60382824bae88e1d303c3c71, type: 3}
+  cube: {fileID: 2389098941218738177, guid: df52dd0a60382824bae88e1d303c3c71, type: 3}
 --- !u!4 &91040608
 Transform:
   m_ObjectHideFlags: 0
@@ -270,7 +270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startWidth: 1
   endWidth: 1
-  obj: {fileID: 0}
+  obj: {fileID: 2528205317606780610, guid: df52dd0a60382824bae88e1d303c3c71, type: 3}
 --- !u!1 &2133449015
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +306,7 @@ Camera:
   m_GameObject: {fileID: 2133449015}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_SensorSize: {x: 36, y: 24}
@@ -320,7 +320,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.32
-  far clip plane: 50
+  far clip plane: 150
   field of view: 60
   orthographic: 0
   orthographic size: 5
