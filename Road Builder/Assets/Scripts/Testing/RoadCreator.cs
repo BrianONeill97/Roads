@@ -18,7 +18,6 @@ public class RoadCreator : MonoBehaviour
 
     private List<Vector3> Pos = new List<Vector3>();
 
-    public MouseDown md;
 
     private void Update()
     {
