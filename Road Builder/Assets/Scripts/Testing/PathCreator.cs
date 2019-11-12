@@ -43,37 +43,23 @@ public class PathCreator : MonoBehaviour
         }
 
 
-        if(test == true)
+        if (Input.GetMouseButton(0))
         {
-            if (!Input.GetMouseButton(0))
-            {
-                endP = Input.mousePosition;
-                endP.z = (thisCamera.farClipPlane - 5) / 2;
-                endP = thisCamera.ScreenToWorldPoint(endP);
-                linePoints.Add(endP);
-                startP = endP;
-            }
-            else
-            {
-                test = false;
-            }
+            endP = Input.mousePosition;
+            endP.z = (thisCamera.farClipPlane - 5) / 2;
+            endP = thisCamera.ScreenToWorldPoint(endP);
+            //linePoints.Add(endP);
+            //startP = endP;
         }
 
-
-        //if (Input.GetMouseButton(0))
-        //{
-        //    //linePoints.Add(endP);
-        //}
-
-        //if(Input.GetMouseButtonUp(0))
-        //{
-        //    linePoints.Add(endP);
-        //    startP = endP;
-        //    fP = false;
-        //}
-        if(linePoints.Count > 1)
+        if(Input.GetMouseButtonUp(0))
         {
-            StartCoroutine(GenerateRoad(startP, endP));
+            linePoints.Add(endP);
+        }
+
+        if (linePoints.Count > 1)
+        {
+            //StartCoroutine(GenerateRoad(startP, endP));
 
             UpdateLine();
         }
@@ -83,13 +69,13 @@ public class PathCreator : MonoBehaviour
 
     void UpdateLine()
     {
-        //lineRenderer.SetWidth(startWidth, endWidth);
-        //lineRenderer.SetVertexCount(linePoints.Count);
+        lineRenderer.SetWidth(startWidth, endWidth);
+        lineRenderer.SetVertexCount(linePoints.Count);
 
         for (int i = 0; i < linePoints.Count; i++)
         {
             Debug.DrawLine(linePoints[i], linePoints[i+1], Color.white, 100f, false);
-            //    lineRenderer.SetPosition(i, linePoints[i]);
+                lineRenderer.SetPosition(i, linePoints[i]);
  
         }
     }

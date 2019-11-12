@@ -5,15 +5,41 @@ ModelImporter:
   fileIDToRecycleName:
     100000: Mesh1_Group1_Model
     100002: //RootNode
+    100004: default
     400000: Mesh1_Group1_Model
     400002: //RootNode
+    400004: default
     2100000: Grass
     2100002: Stone
     2100004: Asphalt
+    2100006: defaultMat
     2300000: Mesh1_Group1_Model
+    2300002: default
     3300000: Mesh1_Group1_Model
+    3300002: default
     4300000: Mesh1_Group1_Model
-  externalObjects: {}
+    4300002: default
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Asphalt
+    second: {fileID: 2100002, guid: 43c546c6b2fd7f140a282d3b2213c16e, type: 3}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Grass
+    second: {fileID: 2100000, guid: 24fa53436c8d958429206d85827ac9e1, type: 3}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Stone
+    second: {fileID: 2100000, guid: 8f809a0a3d69838468c7dac7b0667bb6, type: 3}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: defaultMat
+    second: {instanceID: 0}
   materials:
     importMaterials: 1
     materialName: 0
