@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 727dd6c617af870428f5cab138e25f27
+guid: e130f1f265f70224a88f1d67820d4aff
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -10,34 +10,13 @@ ModelImporter:
     2100000: Stone
     2100002: Asphalt
     2100004: Grass
-    2100006: defaultMat
     2300000: default
     3300000: default
     4300000: default
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Asphalt
-    second: {fileID: 2100002, guid: a040a992bb0d0b346927ef84a9b8894e, type: 3}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Grass
-    second: {fileID: 2100000, guid: 17116c5648c47954da27bd138e1bce77, type: 3}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Stone
-    second: {fileID: 2100000, guid: 09a2dfbc8269e254c9a13dd6341c3546, type: 3}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: defaultMat
-    second: {fileID: 2100000, guid: 4fe229b2d25565748a911830ab166af6, type: 2}
+  externalObjects: {}
   materials:
     importMaterials: 1
-    materialName: 2
+    materialName: 0
     materialSearch: 1
     materialLocation: 1
   animations:
