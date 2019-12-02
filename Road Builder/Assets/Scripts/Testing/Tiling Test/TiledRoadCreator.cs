@@ -7,6 +7,8 @@ public class TiledRoadCreator : MonoBehaviour
     [Header ("Objects")]
     public GameObject straightRoad;
     public GameObject cornerRoad;
+    public GameObject intersection;
+    public GameObject TJunction;
 
     Camera thisCamera;
     private bool _isDraging = false;
@@ -21,7 +23,7 @@ public class TiledRoadCreator : MonoBehaviour
     bool started = false; // turns off the start.
     Vector3 startPoint; // startPoint of the creation.
 
-    GameObject prevObj; // reference to previous object.
+    GameObject currObj; // reference to previous object.
 
     string prevDirection = ""; // previous direction moved in.
 
@@ -97,10 +99,14 @@ public class TiledRoadCreator : MonoBehaviour
             lr.enabled = false;
             return;
         }
-        if (Input.GetKey(KeyCode.Backspace))
+
+        if(Input.GetKey(KeyCode.Backspace))
         {
-            createIntersection();
+            started = false;
         }
+
+        createIntersection();
+        
     }
 
 
@@ -218,7 +224,7 @@ public class TiledRoadCreator : MonoBehaviour
         objectC.transform.localRotation = rot;
         path.Add(objectC);
 
-        prevObj = objectC;
+        currObj = objectC;
     }
 
     Vector3 GetSize(GameObject obj)
@@ -248,15 +254,55 @@ public class TiledRoadCreator : MonoBehaviour
 
     void createIntersection()
     {
-        //if (path.Count > 0)
-        //{
-        //    for (int i = 0; i < path.Count; i++)
-        //    {
-        //        if(path[i].GetComponent<Collider>().bounds.Contains(prevObj.GetComponent<Collider>().bounds.center))
-        //        {
-        //            path[i].SetActive(false);
-        //        }
-        //    }
-        //}
+        if(path.Count > 1)
+        {
+            for(int i = 0; i < path.Count - 1; i++)
+            {
+                if(path[i] != null)
+                {
+                    if (path[i].gameObject.tag == "Road")
+                    {
+                        if (path[i].transform.rotation != currObj.transform.rotation)
+                        {
+                            if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                            {
+                                Destroy(path[i].gameObject);
+                                path.RemoveAt(i);
+                                Destroy(currObj);
+                                placePrefab(placementPosition, intersection, Quaternion.identity);
+                                path.Insert(i, currObj);
+                                return;
+                            }
+                        }
+                    }
+                    else if (path[i].gameObject.tag == "Corner")
+                    {
+                            if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                            {
+                                if (path[i].transform.rotation.eulerAngles.y == 90.0f || path[i].transform.rotation.eulerAngles.y == 0.0f)
+                                {
+                                    Destroy(path[i].gameObject);
+                                    path.RemoveAt(i);
+                                    Destroy(currObj);
+                                    placePrefab(placementPosition, TJunction, Quaternion.identity);
+                                    path.Insert(i, currObj);
+                                    return;
+                                }
+                                else
+                                {
+                                Quaternion rotation = Quaternion.Euler(0, 180, 0);
+                                Destroy(path[i].gameObject);
+                                path.RemoveAt(i);
+                                Destroy(currObj);
+                                placePrefab(placementPosition, TJunction, rotation);
+                                path.Insert(i, currObj);
+                                return;
+                            }
+                            }
+                        
+                    }
+                }
+            }
+        }
     }
 }

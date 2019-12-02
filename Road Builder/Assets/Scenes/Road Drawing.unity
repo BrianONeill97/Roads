@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 18a18be315858d64c9a8ce50ccd52e64, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.55016977, g: 0.7810008, b: 0.77727646, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -189,6 +189,10 @@ MonoBehaviour:
   straightRoad: {fileID: 6101749134381258428, guid: 09d5398ff3bf78048b9b71e85b8d07cb,
     type: 3}
   cornerRoad: {fileID: 7994179338878103790, guid: 10e447e5a89ef2843b68f35643f9a955,
+    type: 3}
+  intersection: {fileID: 6089365292375512096, guid: 3b34a40b8a7d4df4f9d3baf58cddab94,
+    type: 3}
+  TJunction: {fileID: 2763870138194135873, guid: f2abbfe725a79ad45ba8911cc4e7059a,
     type: 3}
 --- !u!4 &1034010785
 Transform:

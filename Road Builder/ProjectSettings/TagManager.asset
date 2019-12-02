@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Corner
   - Road
+  - TJunction
+  - Intersection
   layers:
   - Default
   - TransparentFX
