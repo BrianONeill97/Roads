@@ -106,7 +106,10 @@ public class TiledRoadCreator : MonoBehaviour
         }
 
         createIntersection();
-        
+        if (path.Count > 1)
+        {
+            Debug.Log(path[0].GetComponent<NeighBours>().neighbourCount);
+        }
     }
 
 
@@ -121,7 +124,7 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0.0f, 270.0f, 0.0f);
                     placementPosition.z += (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x + GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
                     placePrefab(placementPosition, cornerRoad, rot);
                     prevDirection = "";
                 } // if moving up this turns you right
@@ -129,7 +132,7 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0.0f, 180.0f, 0.0f);
                     placementPosition.z -= (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x + GetSize(straightRoad).x, placementPosition.y, placementPosition.z);
                     placePrefab(placementPosition, cornerRoad, rot);
                     prevDirection = "";
                 }// if moving down this turns you right
@@ -146,7 +149,7 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0.0f, 360.0f, 0.0f);
                     placementPosition.z += (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x - GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
                     placePrefab(placementPosition, cornerRoad, rot);
                     prevDirection = "";
                 }// if moving up this turns you left
@@ -154,7 +157,7 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0.0f, 450.0f, 0.0f);
                     placementPosition.z -= (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x - GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
                     placePrefab(placementPosition, cornerRoad, rot);
                     prevDirection = "";
                 }// if moving down this turns you left
@@ -171,14 +174,14 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0.0f, 90.0f, 0.0f);
                     placementPosition.x += (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(straightRoad).z);
                     placePrefab(placementPosition, cornerRoad, rot);
                 } // if moving right this turns you upwards
                 else if(prevDirection == "left")
                 {
                     rot = Quaternion.Euler(0.0f, 180.0f, 0.0f);
                     placementPosition.x -= (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(cornerRoad).z);
                     placePrefab(placementPosition, cornerRoad, rot);
                 } // if moving left this turns you upwards
                 else
@@ -195,14 +198,14 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     rot = Quaternion.Euler(0.0f, 0.0f, 0.0f);
                     placementPosition.x += (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(straightRoad).z);
                     placePrefab(placementPosition, cornerRoad, rot);
                 } // if moving right this turns you downwards
                 else if (prevDirection == "left")
                 {
                     rot = Quaternion.Euler(0.0f, 270.0f, 0.0f);
                     placementPosition.x -= (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(straightRoad).z);
                     placePrefab(placementPosition, cornerRoad, rot);
                 } // if moving left this turns you downwards
                 else
@@ -256,53 +259,53 @@ public class TiledRoadCreator : MonoBehaviour
     {
         if(path.Count > 1)
         {
-            for(int i = 0; i < path.Count - 1; i++)
+            for(int i = 0; i < path.Count -1; i++)
             {
                 if(path[i] != null)
                 {
                     if (path[i].gameObject.tag == "Road")
                     {
-                        if (path[i].transform.rotation != currObj.transform.rotation)
+                        if (path[i].transform.rotation != currObj.transform.rotation) // iF the rotation of the road tile that im hitting is not the same then add intersection
                         {
                             if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
                             {
-                                Destroy(path[i].gameObject);
-                                path.RemoveAt(i);
-                                Destroy(currObj);
-                                placePrefab(placementPosition, intersection, Quaternion.identity);
-                                path.Insert(i, currObj);
-                                return;
+                                    replaceObject(path[i], intersection, Quaternion.identity, i);
+                                    return;
                             }
                         }
                     }
-                    else if (path[i].gameObject.tag == "Corner")
+
+                    if (path[i].gameObject.tag == "Corner") // Replaces with a T-Junction
                     {
-                            if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                        if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                        {
+                            if (path[i].transform.rotation.eulerAngles.y == 90.0f || path[i].transform.rotation.eulerAngles.y == 0.0f)
                             {
-                                if (path[i].transform.rotation.eulerAngles.y == 90.0f || path[i].transform.rotation.eulerAngles.y == 0.0f)
-                                {
-                                    Destroy(path[i].gameObject);
-                                    path.RemoveAt(i);
-                                    Destroy(currObj);
-                                    placePrefab(placementPosition, TJunction, Quaternion.identity);
-                                    path.Insert(i, currObj);
+                                    replaceObject(path[i], TJunction, Quaternion.identity, i);
                                     return;
-                                }
-                                else
-                                {
-                                Quaternion rotation = Quaternion.Euler(0, 180, 0);
-                                Destroy(path[i].gameObject);
-                                path.RemoveAt(i);
-                                Destroy(currObj);
-                                placePrefab(placementPosition, TJunction, rotation);
-                                path.Insert(i, currObj);
-                                return;
                             }
+
+                            // Bug here
+                            if (path[i].transform.rotation.eulerAngles.y == 180.0f || path[i].transform.rotation.eulerAngles.y == 270.0f)
+                            {
+                                    replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 180.0f, 0.0f), i);
+                                    return;
                             }
-                        
+                        }
+
                     }
                 }
             }
         }
+    }
+
+    void replaceObject(GameObject obectbeingReplaced, GameObject objectReplacing, Quaternion rot, int placeInList)
+    {
+        Quaternion rotation = rot;
+        Destroy(obectbeingReplaced);
+        path.RemoveAt(placeInList);
+        Destroy(currObj);
+        placePrefab(placementPosition, objectReplacing, rot);
+        path.Insert(placeInList, currObj);
     }
 }
