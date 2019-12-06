@@ -285,14 +285,28 @@ public class TiledRoadCreator : MonoBehaviour
                                     return;
                             }
 
+                            if (path[i].transform.rotation.eulerAngles.y == -90.0f)
+                            {
+                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f,270.0f,0.0f), i);
+                                return;
+                            }
+
                             // Bug here
                             if (path[i].transform.rotation.eulerAngles.y == 180.0f || path[i].transform.rotation.eulerAngles.y == 270.0f)
                             {
-                                    replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 180.0f, 0.0f), i);
+                                    replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 90.0f, 0.0f), i);
                                     return;
                             }
                         }
 
+                    }
+                    if(path[i].gameObject.tag == "Intersection")
+                    {
+                            if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                            {
+                                replaceObject(path[i], intersection, Quaternion.identity, i);
+                                return;
+                            }
                     }
                 }
             }
@@ -307,5 +321,10 @@ public class TiledRoadCreator : MonoBehaviour
         Destroy(currObj);
         placePrefab(placementPosition, objectReplacing, rot);
         path.Insert(placeInList, currObj);
+    }
+
+    void InsideFill()
+    {
+
     }
 }
