@@ -194,6 +194,8 @@ MonoBehaviour:
     type: 3}
   TJunction: {fileID: 2763870138194135873, guid: f2abbfe725a79ad45ba8911cc4e7059a,
     type: 3}
+  grassTile: {fileID: 960948341444673027, guid: 38cba30f2ec92b14c91c2928050c94e6,
+    type: 3}
 --- !u!4 &1034010785
 Transform:
   m_ObjectHideFlags: 0

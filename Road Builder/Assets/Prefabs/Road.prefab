@@ -12,10 +12,8 @@ GameObject:
   - component: {fileID: 6101749134381258430}
   - component: {fileID: 6101749134381258431}
   - component: {fileID: 5860313841801694113}
-  - component: {fileID: 3695748434472381896}
   - component: {fileID: 8763716471992517289}
   - component: {fileID: 1092190074043759414}
-  - component: {fileID: 7053908815181592945}
   m_Layer: 0
   m_Name: Road
   m_TagString: Road
@@ -93,24 +91,11 @@ MeshCollider:
   m_GameObject: {fileID: 6101749134381258428}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300002, guid: 16775c26f74b69049a7a4fd0cefd4271, type: 3}
---- !u!114 &3695748434472381896
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6101749134381258428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b37326eef2a50945bcdac19d127b8a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  neighbourCount: 0
 --- !u!65 &8763716471992517289
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -120,7 +105,7 @@ BoxCollider:
   m_GameObject: {fileID: 6101749134381258428}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 3, y: 0.63, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
@@ -140,16 +125,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
---- !u!135 &7053908815181592945
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6101749134381258428}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1.81653
-  m_Center: {x: 0, y: 0, z: -0.09119058}

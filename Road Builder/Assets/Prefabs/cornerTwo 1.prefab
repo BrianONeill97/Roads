@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 7994179338880298540}
   - component: {fileID: 9044822841663622185}
   - component: {fileID: 4603099398343661096}
-  - component: {fileID: 6693243776069259486}
-  - component: {fileID: 2403876704249427499}
+  - component: {fileID: 8451530992587699524}
   m_Layer: 0
   m_Name: cornerTwo 1
   m_TagString: Corner
@@ -63,7 +62,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 3931b3f5d7815cb4fa3f217502bd50c1, type: 3}
   - {fileID: 2100002, guid: 3931b3f5d7815cb4fa3f217502bd50c1, type: 3}
-  - {fileID: 2100004, guid: 3931b3f5d7815cb4fa3f217502bd50c1, type: 3}
+  - {fileID: 2100006, guid: 8e3ed1ba46d83f14191b1410325626e1, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -113,21 +112,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
---- !u!114 &6693243776069259486
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7994179338878103790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b37326eef2a50945bcdac19d127b8a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  neighbourCount: 0
---- !u!135 &2403876704249427499
-SphereCollider:
+--- !u!65 &8451530992587699524
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -137,5 +123,5 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.6799872
-  m_Center: {x: 0.035563707, y: 0.017794013, z: 0.009752989}
+  m_Size: {x: 3, y: 0.63, z: 3}
+  m_Center: {x: 0.009752989, y: 0.017793998, z: 0.009752989}

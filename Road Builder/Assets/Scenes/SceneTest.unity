@@ -287,8 +287,7 @@ MonoBehaviour:
     type: 3}
   Tree: {fileID: 100000, guid: e7ba6850887ae694a970af5f171fa6d5, type: 3}
   stump: {fileID: 1656226002977108, guid: e191e21fcb275784a9f8b6d08dcd932c, type: 3}
-  plainTile: {fileID: 3800143526618120163, guid: 319d3d4f14f155744b441b30c2fc7731,
-    type: 3}
+  plainTile: {fileID: 100002, guid: 0e3427cb5074a144cbfadaf8d8418306, type: 3}
 --- !u!4 &1388790739
 Transform:
   m_ObjectHideFlags: 0

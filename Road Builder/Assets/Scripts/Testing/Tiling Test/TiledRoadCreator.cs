@@ -9,6 +9,7 @@ public class TiledRoadCreator : MonoBehaviour
     public GameObject cornerRoad;
     public GameObject intersection;
     public GameObject TJunction;
+    public GameObject grassTile;
 
     Camera thisCamera;
     private bool _isDraging = false;
@@ -31,6 +32,8 @@ public class TiledRoadCreator : MonoBehaviour
 
     LineRenderer lr;
 
+    int cornerCount = 0;
+
 
     private void Awake()
     {
@@ -40,6 +43,16 @@ public class TiledRoadCreator : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKey(KeyCode.Backspace))
+        {
+            started = false;
+        }
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            FloodFill(_get3dMousePosition());
+        }
+
         if (Input.GetMouseButtonDown(0))
         {         
             if (started == false)
@@ -56,7 +69,6 @@ public class TiledRoadCreator : MonoBehaviour
             _isDraging = true;
         }
 
-
         if (_isDraging)
         {
             //Gets the position of the mouse
@@ -66,7 +78,6 @@ public class TiledRoadCreator : MonoBehaviour
 
 
             lr.SetPosition(1, currentMousePosition);
-            //Debug.Log(angle);
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -100,16 +111,8 @@ public class TiledRoadCreator : MonoBehaviour
             return;
         }
 
-        if(Input.GetKey(KeyCode.Backspace))
-        {
-            started = false;
-        }
-
         createIntersection();
-        if (path.Count > 1)
-        {
-            Debug.Log(path[0].GetComponent<NeighBours>().neighbourCount);
-        }
+        tJunction();
     }
 
 
@@ -275,31 +278,6 @@ public class TiledRoadCreator : MonoBehaviour
                         }
                     }
 
-                    if (path[i].gameObject.tag == "Corner") // Replaces with a T-Junction
-                    {
-                        if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
-                        {
-                            if (path[i].transform.rotation.eulerAngles.y == 90.0f || path[i].transform.rotation.eulerAngles.y == 0.0f)
-                            {
-                                    replaceObject(path[i], TJunction, Quaternion.identity, i);
-                                    return;
-                            }
-
-                            if (path[i].transform.rotation.eulerAngles.y == -90.0f)
-                            {
-                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f,270.0f,0.0f), i);
-                                return;
-                            }
-
-                            // Bug here
-                            if (path[i].transform.rotation.eulerAngles.y == 180.0f || path[i].transform.rotation.eulerAngles.y == 270.0f)
-                            {
-                                    replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 90.0f, 0.0f), i);
-                                    return;
-                            }
-                        }
-
-                    }
                     if(path[i].gameObject.tag == "Intersection")
                     {
                             if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
@@ -307,6 +285,49 @@ public class TiledRoadCreator : MonoBehaviour
                                 replaceObject(path[i], intersection, Quaternion.identity, i);
                                 return;
                             }
+                    }
+                }
+            }
+        }
+    }
+
+    void tJunction()
+    {
+        if (path.Count > 1)
+        {
+            for (int i = 0; i < path.Count - 1; i++)
+            {
+                if (path[i] != null)
+                {
+                    if (path[i].gameObject.tag == "Corner") // Replaces with a T-Junction
+                    {
+                        if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                        {
+                            if (path[i].transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 0.0f  || path[i].transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 90.0f)
+                            {
+                                replaceObject(path[i], TJunction, Quaternion.identity, i);
+                                return;
+                            }
+
+                            if (path[i].transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 0.0f || path[i].transform.rotation.eulerAngles.y == 180.0f && currObj.transform.rotation.eulerAngles.y == 0.0f)
+                            {
+                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 90.0f, 0.0f), i);
+                                return;
+                            }
+
+                            if (path[i].transform.rotation.eulerAngles.y == 0.0f && currObj.transform.rotation.eulerAngles.y == 0.0f || path[i].transform.rotation.eulerAngles.y == 270.0f && currObj.transform.rotation.eulerAngles.y == 0.0f)
+                            {
+                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 270.0f, 0.0f), i);
+                                return;
+                            }
+
+                            if (path[i].transform.rotation.eulerAngles.y == 180.0f && currObj.transform.rotation.eulerAngles.y == 90.0f || path[i].transform.rotation.eulerAngles.y == 270.0f && currObj.transform.rotation.eulerAngles.y == 90.0f)
+                            {
+                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 180.0f, 0.0f), i);
+                                return;
+                            }
+                        }
+
                     }
                 }
             }
@@ -323,8 +344,19 @@ public class TiledRoadCreator : MonoBehaviour
         path.Insert(placeInList, currObj);
     }
 
-    void InsideFill()
+    void FloodFill(Vector3 pos)
     {
+        //Collider[] intersecting = Physics.OverlapSphere(pos, GetSize(grassTile).x / 2);
+        //if(intersecting.Length != 0)
+        //{
+        //    return;
+        //}
 
+        //placePrefab(pos, grassTile, Quaternion.identity);
+        //FloodFill(new Vector3(pos.x + GetSize(grassTile).x, pos.y, pos.z));
+        //FloodFill(new Vector3(pos.x - GetSize(grassTile).x, pos.y, pos.z));
+        //FloodFill(new Vector3(pos.x, pos.y, pos.z + GetSize(grassTile).z));
+        //FloodFill(new Vector3(pos.x, pos.y, pos.z - GetSize(grassTile).z));
+        //return;
     }
 }
