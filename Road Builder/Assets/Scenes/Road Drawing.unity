@@ -188,7 +188,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   straightRoad: {fileID: 6101749134381258428, guid: 09d5398ff3bf78048b9b71e85b8d07cb,
     type: 3}
-  cornerRoad: {fileID: 7994179338878103790, guid: 10e447e5a89ef2843b68f35643f9a955,
+  cornerRoad: {fileID: 4273894996351694923, guid: bf42670df7b52df4aa056840e5eba54b,
     type: 3}
   intersection: {fileID: 6089365292375512096, guid: 3b34a40b8a7d4df4f9d3baf58cddab94,
     type: 3}
