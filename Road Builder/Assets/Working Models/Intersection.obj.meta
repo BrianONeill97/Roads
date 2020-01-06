@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 69dba32267482724ea86d089abb17dc3
+guid: 3931b3f5d7815cb4fa3f217502bd50c1
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -7,9 +7,9 @@ ModelImporter:
     100002: //RootNode
     400000: default
     400002: //RootNode
-    2100000: Stone
-    2100002: Asphalt
-    2100004: Grass
+    2100000: Stone.002
+    2100002: Asphalt.002
+    2100004: Grass.007
     2300000: default
     3300000: default
     4300000: default

@@ -1,18 +1,17 @@
 fileFormatVersion: 2
-guid: 8c9141d29e8eb384a90448fdeabd936f
+guid: 5e50fb09beee3e84c958d81677763ca3
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
-    100002: Mesh1_Group1_Model
+    100002: default
     400000: //RootNode
-    400002: Mesh1_Group1_Model
-    2100000: Stone
-    2100002: Asphalt
-    2100004: Grass
-    2300000: Mesh1_Group1_Model
-    3300000: Mesh1_Group1_Model
-    4300000: Mesh1_Group1_Model
+    400002: default
+    2100000: Grass.001
+    2100002: Alternate_Dirt.001
+    2300000: default
+    3300000: default
+    4300000: default
   externalObjects: {}
   materials:
     importMaterials: 1

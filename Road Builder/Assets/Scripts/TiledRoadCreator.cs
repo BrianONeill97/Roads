@@ -1,137 +1,140 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TiledRoadCreator : MonoBehaviour
 {
-    [Header ("Objects")]
-    public GameObject straightRoad;
-    public GameObject cornerRoad;
-    public GameObject intersection;
-    public GameObject TJunction;
-    public GameObject grassTile;
+    [Header("Objects")]
+    GameObject straightRoad;
+    GameObject cornerRoad;
+    GameObject intersection;
+    GameObject TJunction; 
+    GameObject grassTile; 
+    GameObject ramp;
 
-    Camera thisCamera;
-    private bool _isDraging = false; // Bool for if im dragging
+    public GameObject dropDown;
+    public GameObject Canvas;
 
-    //Variables for Placement
-    Quaternion rot; // rotation for tiles.
-    Vector3 placementPosition; // position for placing the tiles.
-    Vector3 currentMousePosition; // current mouse position on the screen.
-    float selectorAngle; // angle used for choosing the roads.
+    //Track to be saved
+    private GameObject track;
 
-    bool started = false; // turns off the start.
-    Vector3 startPoint; // startPoint of the creation.
 
     GameObject currObj; // reference to previous object.
-
-    string prevDirection = ""; // previous direction moved in.
-
     List<GameObject> path = new List<GameObject>(); // List of all the road tiles in the path.
+    LineRenderer lr; // line renderer
+    Camera thisCamera;
 
-    LineRenderer lr; // line renderer.
+    private bool _isDraging = false; // Bool for if im dragging
+    bool started = false; // turns off the start.
 
-    //int floodCount = 0;
+    //Variables for Placement
+    Quaternion rot;
 
-    private GameObject[][] ground;
-    public int ColumnLength;
-    public int RowHeight;
+    Vector3 placementPosition; // position for placing the tiles.
+    Vector3 startPoint; // startPoint of the creation.
+
+    float selectorAngle; // angle used for choosing the roads.
+    string prevDirection = ""; // previous direction moved in.
+    static int trackNumber = 0;
 
 
     private void Awake()
     {
+        //straightRoad = Resources.Load("City/Road") as GameObject;
+        //cornerRoad = Resources.Load("City/corner") as GameObject;
+        //intersection = Resources.Load("City/Intersection") as GameObject;
+        //TJunction = Resources.Load("City/T-Junction") as GameObject;
+        //grassTile = Resources.Load("Plain") as GameObject;
+        //ramp = Resources.Load("City/Ramp") as GameObject;
+
         thisCamera = Camera.main;
         lr = gameObject.GetComponent<LineRenderer>();
-    }
-
-    private void Start()
-    {
-        createGrid();
+        track = new GameObject("Track" + trackNumber);
+        track.gameObject.tag = "Track";
     }
 
     void Update()
     {
+        changeTileType();
         thisCamera.transform.position = new Vector3(placementPosition.x, thisCamera.transform.position.y, placementPosition.z);
-        //Lets you start the road again at a new place.
-        //if (Input.GetKey(KeyCode.Backspace))
-        //{
-        //    started = false;
-        //}
+        //KEYBOARD PRESSES
+        //ALTER Y OF THE ROADS
+        if (Input.GetKeyUp(KeyCode.UpArrow))
+                {
+                    //RampUp();
+                }
 
-        ////Fill in the area that the mouse is in.
-        //if (Input.GetKey(KeyCode.Space))
-        //{
-        //    floodCount = 0;
-        //    FloodFill(new Vector3(_get3dMousePosition().x,placementPosition.y,_get3dMousePosition().z)); // TODO:Should work automaticaaly next
-        //}
+        if (Input.GetKeyUp(KeyCode.DownArrow))
+                {
+                    //RampDown();
+                }
 
-        //Create the roads with the mouse.
-        if (Input.GetMouseButtonDown(0))
-        {         
-            if (started == false)//After the first tile of the road has been placed
-            {
-                //Creates first tile,Sets the directional tools start point
-                startPoint = _get3dMousePosition();
-                placePrefab(startPoint,straightRoad,Quaternion.identity);
-                placementPosition = startPoint;
-                started = true;
-            }
-            // shows the tool when held 
-            lr.enabled = true;
-            lr.positionCount = 2;
-            lr.SetPosition(0, startPoint);
-
-            _isDraging = true;
-        }
-
-        if (_isDraging)
+        if (!EventSystem.current.IsPointerOverGameObject())
         {
-            //Gets the position of the mouse
-            currentMousePosition = _get3dMousePosition();
-            Vector3 dir = currentMousePosition - startPoint;
-            selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-
-
-            lr.SetPosition(1, currentMousePosition);
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            if (selectorAngle >= 65 && selectorAngle <= 115)
+            //MOUSE PRESSES
+            //Create the roads with the mouse.
+            if (Input.GetMouseButtonDown(0))
             {
-                ChooseDirection(straightRoad, "right");
-                prevDirection = "right";
-            }
+                if (started == false)//After the first tile of the road has been placed
+                {
+                    //Creates first tile,Sets the directional tools start point
+                    startPoint = _get3dMousePosition();
+                    createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
+                    placementPosition = startPoint;
+                    started = true;
+                }
+                // shows the tool when held 
+                lr.enabled = true;
+                lr.positionCount = 2;
+                lr.SetPosition(0, startPoint);
 
-            if (selectorAngle > -115 && selectorAngle < -65)
-            {
-                ChooseDirection(straightRoad, "left");
-                prevDirection = "left";
+                _isDraging = true;
             }
+            //Changes the line rotation.
+            if (_isDraging)
+            {
+                //Gets the position of the mouse
+                Vector3 dir = _get3dMousePosition() - startPoint;
+                selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+                lr.SetPosition(1, _get3dMousePosition());
+            }
+            //Gets the angle of the line and then selects the road from that.
+            if (Input.GetMouseButtonUp(0))
+            {
+                if (selectorAngle >= 65 && selectorAngle <= 115)
+                {
+                    ChooseDirectionRoads(straightRoad, "right");
+                    prevDirection = "right";
+                }
+                if (selectorAngle > -115 && selectorAngle < -65)
+                {
+                    ChooseDirectionRoads(straightRoad, "left");
+                    prevDirection = "left";
+                }
+                if (selectorAngle > 155 && selectorAngle > -155)
+                {
+                    ChooseDirectionRoads(straightRoad, "down");
+                    prevDirection = "down";
+                }
+                if (selectorAngle < 25 && selectorAngle > -25)
+                {
+                    ChooseDirectionRoads(straightRoad, "up");
+                    prevDirection = "up";
+                }
 
-            if (selectorAngle > 155 && selectorAngle > -155)
-            {
-                ChooseDirection(straightRoad, "down");
-                prevDirection = "down";
+                _isDraging = false;
+                lr.enabled = false;
             }
-            if (selectorAngle < 25 && selectorAngle > -25)
-            {
-                ChooseDirection(straightRoad, "up");
-                prevDirection = "up";
-            }
-
-            _isDraging = false;
-            lr.enabled = false;
-            return;
         }
 
         createIntersection();
         tJunction();
     }
 
-
-    // Utility Functions
-    void ChooseDirection(GameObject obj, string direction)
+    //Create the roads
+    void ChooseDirectionRoads(GameObject obj, string direction)
     {
         switch(direction)
         {
@@ -139,169 +142,134 @@ public class TiledRoadCreator : MonoBehaviour
             case "right":
                 if(prevDirection == "up")
                 {
-                    rot = Quaternion.Euler(0.0f, 270.0f, 0.0f);
-                    placementPosition.z += (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x + GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    placementPosition.z += (GetSize(cornerRoad).z); // moves placement for road
+                    startPoint = new Vector3(placementPosition.x + GetSize(cornerRoad).x, placementPosition.y, placementPosition.z); // moves startpoint
+                    createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 270.0f, 0.0f),cornerRoad.gameObject.tag);
                     prevDirection = "";
                 } // if moving up this turns you right
                 else if(prevDirection == "down")
                 {
-                    rot = Quaternion.Euler(0.0f, 180.0f, 0.0f);
                     placementPosition.z -= (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x + GetSize(straightRoad).x, placementPosition.y, placementPosition.z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    startPoint = new Vector3(placementPosition.x + GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
+                    createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 180.0f, 0.0f),cornerRoad.gameObject.tag);
                     prevDirection = "";
                 }// if moving down this turns you right
                 else
                 {
-                    placementPosition.x += (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x + GetSize(straightRoad).x, placementPosition.y, placementPosition.z);
-                    placePrefab(placementPosition, straightRoad, Quaternion.identity);
+                    placementPosition.x += (GetSize(obj).x);
+                    startPoint = new Vector3(placementPosition.x + GetSize(obj).x, placementPosition.y, placementPosition.z);
+                    createTile(placementPosition, obj, Quaternion.identity,obj.gameObject.tag);
                 } // otherwise just move right normally
                 break;
 
             case "left":
                 if(prevDirection == "up")
                 {
-                    rot = Quaternion.Euler(0.0f, 360.0f, 0.0f);
                     placementPosition.z += (GetSize(cornerRoad).z);
                     startPoint = new Vector3(placementPosition.x - GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    createTile(placementPosition, cornerRoad, Quaternion.identity,cornerRoad.gameObject.tag);
                     prevDirection = "";
                 }// if moving up this turns you left
                 else if(prevDirection == "down")
                 {
-                    rot = Quaternion.Euler(0.0f, 450.0f, 0.0f);
                     placementPosition.z -= (GetSize(cornerRoad).z);
                     startPoint = new Vector3(placementPosition.x - GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 90.0f, 0.0f),cornerRoad.gameObject.tag);
                     prevDirection = "";
                 }// if moving down this turns you left
                 else
                 {
-                    placementPosition.x -= (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x - GetSize(straightRoad).x, placementPosition.y, placementPosition.z);
-                    placePrefab(placementPosition, straightRoad, Quaternion.identity);
+                    placementPosition.x -= (GetSize(obj).x);
+                    startPoint = new Vector3(placementPosition.x - GetSize(obj).x, placementPosition.y, placementPosition.z);
+                    createTile(placementPosition, obj, Quaternion.identity,obj.gameObject.tag);
                 }// otherwise just move left normally
                 break;
 
             case "up":
                 if(prevDirection == "right")
                 {
-                    rot = Quaternion.Euler(0.0f, 90.0f, 0.0f);
                     placementPosition.x += (GetSize(cornerRoad).x);
                     startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(straightRoad).z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 90.0f, 0.0f),cornerRoad.gameObject.tag);
                 } // if moving right this turns you upwards
                 else if(prevDirection == "left")
                 {
-                    rot = Quaternion.Euler(0.0f, 180.0f, 0.0f);
                     placementPosition.x -= (GetSize(cornerRoad).x);
                     startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(cornerRoad).z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 180.0f, 0.0f),cornerRoad.gameObject.tag);
                 } // if moving left this turns you upwards
                 else
                 {
-                    rot = Quaternion.Euler(0.0f, 90.0f, 0.0f);
-                    placementPosition.z += (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(straightRoad).z);
-                    placePrefab(placementPosition, straightRoad, rot);
+                    placementPosition.z += (GetSize(obj).z);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(obj).z);
+                    createTile(placementPosition, obj, Quaternion.Euler(0.0f, 90.0f, 0.0f),obj.gameObject.tag);
                 } // move up normally 
                 break;
 
             case "down":
                 if(prevDirection == "right")
                 {
-                    rot = Quaternion.Euler(0.0f, 0.0f, 0.0f);
-                    placementPosition.x += (GetSize(cornerRoad).x);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(straightRoad).z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    placementPosition.x += (GetSize(obj).x);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(obj).z);
+                    createTile(placementPosition, cornerRoad, Quaternion.identity,cornerRoad.gameObject.tag);
                 } // if moving right this turns you downwards
                 else if (prevDirection == "left")
                 {
-                    rot = Quaternion.Euler(0.0f, 270.0f, 0.0f);
                     placementPosition.x -= (GetSize(cornerRoad).x);
                     startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(straightRoad).z);
-                    placePrefab(placementPosition, cornerRoad, rot);
+                    createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 270.0f, 0.0f),cornerRoad.gameObject.tag);
                 } // if moving left this turns you downwards
                 else
                 {
-                    rot = Quaternion.Euler(0.0f, 90.0f, 0.0f);
-                    placementPosition.z -= (GetSize(cornerRoad).z);
-                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(straightRoad).z);
-                    placePrefab(placementPosition, straightRoad, rot);
+                    placementPosition.z -= (GetSize(obj).z);
+                    startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(obj).z);
+                    createTile(placementPosition, obj, Quaternion.Euler(0.0f, 90.0f, 0.0f),obj.gameObject.tag);
                 } // move down normally
                 break;
         }
     }
 
-    void placePrefab(Vector3 location, GameObject obj,Quaternion q)
-    {
-                rot = q;
-                GameObject objectC = Instantiate(obj, transform);
-                objectC.transform.localPosition = location;
-                objectC.transform.localRotation = rot;
-                path.Add(objectC);
-                currObj = objectC;
-    }
-
-    Vector3 GetSize(GameObject obj)
-    {
-        Vector3 dimensions;
-        float width = obj.GetComponent<Renderer>().bounds.size.x * transform.localScale.x;
-        float height = obj.GetComponent<Renderer>().bounds.size.y * transform.localScale.y;
-        float depth = obj.GetComponent<Renderer>().bounds.size.z * transform.localScale.z;
-        dimensions = new Vector3(width, height, depth);
-        return dimensions;
-    }
-
-    private Vector3 _get3dMousePosition()
-    {
-        Vector3 newPos = new Vector3();
-        newPos = Input.mousePosition;
-        newPos.z = (thisCamera.farClipPlane - 5) / 2;
-        newPos = thisCamera.ScreenToWorldPoint(newPos);
-        return newPos;
-    }
-
-    float GetMag(Vector3 start, Vector3 end)
-    {
-        float mag = Mathf.Sqrt(((start.x * end.x) + (start.y * start.y) + (start.z * end.z)));
-        return mag;
-    }
-
     void createIntersection()
     {
-        if(path.Count > 1)
+        if (path.Count > 1)
         {
-            for(int i = 0; i < path.Count -1; i++)
+            for (int i = 0; i < path.Count; i++)
             {
-                if(path[i] != null)
+                if (path[i] != null)
                 {
-                    if (path[i].gameObject.tag == "Road")
+                    if (Mathf.Approximately(path[i].gameObject.transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].gameObject.transform.position.y, currObj.transform.position.y) && Mathf.Approximately(path[i].gameObject.transform.position.z, currObj.transform.position.z))
                     {
-                        if (path[i].transform.rotation != currObj.transform.rotation) // iF the rotation of the road tile that im hitting is not the same then add intersection
+                        //Creates Intersection when tow road hit from the side
+                        if (path[i].gameObject.gameObject.tag == "Road")
                         {
-                            if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                            if (path[i].gameObject.transform.rotation != currObj.transform.rotation) // iF the rotation of the road tile that im hitting is not the same then add intersection
                             {
-                                    replaceObject(path[i], intersection, Quaternion.identity, i);
-                                    return;
+
+                                replaceObject(path[i].gameObject, intersection, Quaternion.identity, i);
+                                return;
+
                             }
                         }
-                    }
-
-                    if(path[i].gameObject.tag == "Intersection")
-                    {
-                            if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                        else if (path[i].gameObject.gameObject.tag == "TJunction")                         // Creates intersection from an intersection
+                        {
+                            if (currObj.gameObject.tag == "Road")
                             {
-                                replaceObject(path[i], intersection, Quaternion.identity, i);
-                                return;
+                                if (path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation == Quaternion.identity ||
+                                    path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation.eulerAngles.y == 180.0f ||
+                                    path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 90.0f ||
+                                    path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 270.0f)
+                                {
+                                    replaceObject(path[i].gameObject, intersection, Quaternion.identity, i);
+                                    return;
+                                }
                             }
+                        }
+
                     }
                 }
             }
         }
+
     }
 
     void tJunction()
@@ -312,40 +280,137 @@ public class TiledRoadCreator : MonoBehaviour
             {
                 if (path[i] != null)
                 {
-                    if (path[i].gameObject.tag == "Corner") // Replaces with a T-Junction
+                    if (Mathf.Approximately(path[i].gameObject.transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].gameObject.transform.position.y, currObj.transform.position.y) && Mathf.Approximately(path[i].gameObject.transform.position.z, currObj.transform.position.z))
                     {
-                        if (Mathf.Approximately(path[i].transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].transform.position.z, currObj.transform.position.z))
+                        //Corner Checks
+                        if (path[i].gameObject.gameObject.tag == "Corner") // Replaces with a T-Junction
                         {
-                            if (path[i].transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 0.0f  || path[i].transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 90.0f)
+                            if (path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation == Quaternion.identity || path[i].gameObject.transform.rotation.eulerAngles.y == 180.0f && currObj.transform.rotation == Quaternion.identity)
                             {
-                                replaceObject(path[i], TJunction, Quaternion.identity, i);
+                                replaceObject(path[i].gameObject, TJunction, Quaternion.Euler(0.0f, 90.0f, 0.0f), i);
                                 return;
                             }
 
-                            if (path[i].transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 0.0f || path[i].transform.rotation.eulerAngles.y == 180.0f && currObj.transform.rotation.eulerAngles.y == 0.0f)
+                            if (path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 90.0f || path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation.eulerAngles.y == 90.0f)
                             {
-                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 90.0f, 0.0f), i);
+                                replaceObject(path[i].gameObject, TJunction, Quaternion.identity, i);
                                 return;
                             }
 
-                            if (path[i].transform.rotation.eulerAngles.y == 0.0f && currObj.transform.rotation.eulerAngles.y == 0.0f || path[i].transform.rotation.eulerAngles.y == 270.0f && currObj.transform.rotation.eulerAngles.y == 0.0f)
+                            if (path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation == Quaternion.identity || path[i].gameObject.transform.rotation.eulerAngles.y == 270.0f && currObj.transform.rotation == Quaternion.identity)
                             {
-                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 270.0f, 0.0f), i);
+                                replaceObject(path[i].gameObject, TJunction, Quaternion.Euler(0.0f, 270.0f, 0.0f), i);
                                 return;
                             }
 
-                            if (path[i].transform.rotation.eulerAngles.y == 180.0f && currObj.transform.rotation.eulerAngles.y == 90.0f || path[i].transform.rotation.eulerAngles.y == 270.0f && currObj.transform.rotation.eulerAngles.y == 90.0f)
+                            if (path[i].gameObject.transform.rotation.eulerAngles.y == 180.0f && currObj.transform.rotation.eulerAngles.y == 90.0f || path[i].gameObject.transform.rotation.eulerAngles.y == 270.0f && currObj.transform.rotation.eulerAngles.y == 90.0f)
                             {
-                                replaceObject(path[i], TJunction, Quaternion.Euler(0.0f, 180.0f, 0.0f), i);
+                                replaceObject(path[i].gameObject, TJunction, Quaternion.Euler(0.0f, 180.0f, 0.0f), i);
                                 return;
                             }
                         }
-
                     }
                 }
             }
         }
     }
+
+
+    // __    __.  ___________. __   __       __  .___________.____    ____     _______  __    __. __    __.   ______. ___________. __    ______   .__   __.      _______.
+    //|  |  |  | |           ||  | |  |     |  | |           |\   \  /   /    |   ____||  |  |  | |  \ |  |  /      ||           ||  |  /  __  \  |  \ |  |     /       |
+    //|  |  |  | `---|  |----`|  | |  |     |  | `---|  |----` \   \/   /     |  |__   |  |  |  | |   \|  | |  ,----'`---|  |----`|  | |  |  |  | |   \|  |    |   (----`
+    //|  |  |  |     |  |     |  | |  |     |  |     |  |       \_ _/      |   __|  |  |  |  | |  . `  | |  |         |  |     |  | |  |  |  | |  . `  |     \   \    
+    //|  `--'  |     |  |     |  | |  `----.|  |     |  |         |  |        |  |     |  `--'  | |  |\   | |  `----.    |  |     |  | |  `--'  | |  |\   | .----)   |   
+    // \______/      |__|     |__| |_______||__|     |__|         |__|        |__|      \______/  |__| \__|  \______|    |__|     |__|  \______/  |__| \__| |_______/  
+
+    void createTile(Vector3 location, GameObject obj,Quaternion q,string tileTag)
+    {
+        Collider[] hit = Physics.OverlapSphere(location, 0);
+        if (hit.Length > 0 )
+        {
+            if(hit[0].gameObject.tag == "Intersection")
+            {
+                tileTag = "";
+                return;
+            }
+
+            if (hit[0].gameObject.tag == "Corner")
+            {
+                rot = q;
+                GameObject objectC = Instantiate(obj, track.transform);
+                objectC.transform.localPosition = location;
+                objectC.transform.localRotation = q;
+                path.Add(objectC);
+                currObj = objectC;
+                tileTag = currObj.gameObject.tag;
+                return;
+            }
+
+            if (tileTag == "Road")
+            {
+                if(hit[0].transform.localRotation == q)
+                { 
+                    tileTag = "";
+                    return;
+                }
+                else
+                {
+                    rot = q;
+                    GameObject objectC = Instantiate(obj, track.transform);
+                    objectC.transform.localPosition = location;
+                    objectC.transform.localRotation = q;
+                    path.Add(objectC);
+                    currObj = objectC;
+                    tileTag = currObj.gameObject.tag;
+                }
+            }
+            else
+            {
+                rot = q;
+                GameObject objectC = Instantiate(obj, track.transform);
+                objectC.transform.localPosition = location;
+                objectC.transform.localRotation = q;
+                path.Add(objectC);
+                currObj = objectC;
+                tileTag = currObj.gameObject.tag;
+            }
+        }
+        else
+        {
+            rot = q;
+            GameObject objectC = Instantiate(obj, track.transform);
+            objectC.transform.localPosition = location;
+            objectC.transform.localRotation = q;
+            path.Add(objectC);
+            currObj = objectC;
+            tileTag = currObj.gameObject.tag;
+        }
+    } // Creates a tile 
+
+    Vector3 GetSize(GameObject obj)
+    {
+        Vector3 dimensions;
+        float width = obj.GetComponent<Renderer>().bounds.size.x * transform.localScale.x;
+        float height = obj.GetComponent<Renderer>().bounds.size.y * transform.localScale.y;
+        float depth = obj.GetComponent<Renderer>().bounds.size.z * transform.localScale.z;
+        dimensions = new Vector3(width, height, depth);
+        return dimensions;
+    } // Gets the ACTUAL size of the tile
+
+    private Vector3 _get3dMousePosition()
+    {
+        Vector3 newPos = new Vector3();
+        newPos = Input.mousePosition;
+        newPos.z = (thisCamera.farClipPlane - 5) / 2;
+        newPos = thisCamera.ScreenToWorldPoint(newPos);
+        return newPos;
+    } // Gets the mouse position 
+
+    float GetMag(Vector3 start, Vector3 end)
+    {
+        float mag = Mathf.Sqrt(((start.x * end.x) + (start.y * start.y) + (start.z * end.z)));
+        return mag;
+    } // Gets the magnitude of the line Vector
 
     void replaceObject(GameObject obectbeingReplaced, GameObject objectReplacing, Quaternion rot, int placeInList)
     {
@@ -353,44 +418,136 @@ public class TiledRoadCreator : MonoBehaviour
         Destroy(obectbeingReplaced);
         path.RemoveAt(placeInList);
         Destroy(currObj);
-        placePrefab(placementPosition, objectReplacing, rot);
+        createTile(placementPosition, objectReplacing, rot,objectReplacing.gameObject.tag);
         path.Insert(placeInList, currObj);
+    } // REplace the game object in the list with a new one
+
+    void emptyPath()
+    {
+        for(int i = 0; i < path.Count; i++)
+        {
+            path.RemoveAt(i);
+        }
+        Destroy(track);
+        trackNumber++;
+    } // Empty the path for the new track
+
+    public void createNewPath()
+    {
+        emptyPath();
+        Destroy(currObj);
+        //started = false;
+        track = new GameObject("Track" + trackNumber);
     }
 
-    //void FloodFill(Vector3 pos)
-    //{
-    //    floodCount++;
-    //    Collider[] intersecting = Physics.OverlapSphere(pos, GetSize(grassTile).x * 0.5f);
-    //    if (intersecting.Length != 0)
-    //    {
-    //        return;
-    //    }
-
-    //    if(floodCount > 60)
-    //    {
-    //        return;
-    //    }
-
-
-    //    placePrefab(pos, grassTile, Quaternion.identity);
-
-    //    FloodFill(new Vector3(pos.x, pos.y, pos.z - GetSize(grassTile).z));
-    //    FloodFill(new Vector3(pos.x + GetSize(grassTile).x, pos.y, pos.z));
-    //    FloodFill(new Vector3(pos.x, pos.y, pos.z + GetSize(grassTile).z));
-    //   // FloodFill(new Vector3(pos.x - GetSize(grassTile).x, pos.y, pos.z));
-            
-        
-    //    return;
-    //}
-
-    void createGrid()
+    void changeTileType()
     {
-        for(int i = 0; i < ColumnLength; i++)
+        if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Select Road Type")
         {
-            for(int j = 0; j < RowHeight; j++)
-            {
-                Instantiate(grassTile, new Vector3(GetSize(grassTile).x * i, 77.5f, GetSize(grassTile).z * j), Quaternion.identity);
-            }
+            Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = true;
+        }
+
+        if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "City")
+        {
+                Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = false;
+                Debug.Log("City");
+                straightRoad = Resources.Load("City/Road") as GameObject;
+                cornerRoad = Resources.Load("City/corner") as GameObject;
+                intersection = Resources.Load("City/Intersection") as GameObject;
+                TJunction = Resources.Load("City/T-Junction") as GameObject;
+                grassTile = Resources.Load("Plain") as GameObject;
+                ramp = Resources.Load("City/Ramp") as GameObject;            
+        }
+        if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Country")
+        {
+            Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = false;
+            Debug.Log("Country");
+            straightRoad = Resources.Load("Country/Road") as GameObject;
+            cornerRoad = Resources.Load("Country/corner") as GameObject;
+            intersection = Resources.Load("Country/Intersection") as GameObject;
+            TJunction = Resources.Load("Country/T-Junction") as GameObject;
+            grassTile = Resources.Load("Plain") as GameObject;
+            ramp = Resources.Load("City/Ramp") as GameObject;
         }
     }
+
+    //Testing functions (NOT PERMANANT)
+    //void RampUp()
+    //{
+    //    if (prevDirection == "right")
+    //    {
+    //        placementPosition.x += (GetSize(ramp).x);
+    //        startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+    //        createTile(placementPosition, ramp, Quaternion.identity);
+    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+    //    }
+
+    //    if (prevDirection == "left")
+    //    {
+    //        placementPosition.x -= (GetSize(ramp).x);
+    //        startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0));
+    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+    //    }
+
+    //    if (prevDirection == "up")
+    //    {
+    //        placementPosition.z += (GetSize(ramp).z);
+    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0));
+    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+    //    }
+
+    //    if (prevDirection == "down")
+    //    {
+    //        placementPosition.z -= (GetSize(ramp).z);
+    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0));
+    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+    //    }
+    //}
+
+    //void RampDown()
+    //{
+    //    if (prevDirection == "right")
+    //    {
+    //        placementPosition.x += (GetSize(ramp).x);
+    //        startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0));
+    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+    //    }
+
+    //    if (prevDirection == "left")
+    //    {
+    //        placementPosition.x -= (GetSize(ramp).x);
+    //        startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+    //        createTile(placementPosition, ramp, Quaternion.identity);
+    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+    //    }
+
+    //    if (prevDirection == "up")
+    //    {
+    //        placementPosition.z += (GetSize(ramp).z);
+    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0));
+    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+    //    }
+
+    //    if (prevDirection == "down")
+    //    {
+    //        placementPosition.z -= (GetSize(ramp).z);
+    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
+    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0));
+    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+    //    }
+    //}
+
 }

@@ -8,6 +8,8 @@ TagManager:
   - Road
   - TJunction
   - Intersection
+  - Ramp
+  - Track
   layers:
   - Default
   - TransparentFX
