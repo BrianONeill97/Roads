@@ -1,21 +1,28 @@
 fileFormatVersion: 2
-guid: 69dba32267482724ea86d089abb17dc3
+guid: d8b30ab52a080594f863696c5fa67c1f
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: default
-    100002: //RootNode
-    400000: default
-    400002: //RootNode
-    2100000: Stone
-    2100002: Asphalt
-    2100004: Grass
-    2100006: Alternate_Dirt.004
-    2100008: Grass.004
-    2100010: defaultMat
-    2300000: default
-    3300000: default
-    4300000: default
+    100000: drvoKlupa117
+    100002: farbaKlupa117
+    100004: //RootNode
+    100006: srafKlupa117
+    400000: drvoKlupa117
+    400002: farbaKlupa117
+    400004: //RootNode
+    400006: srafKlupa117
+    2100000: drvoKlupa117
+    2100002: farbaKlupa117
+    2100004: srafKlupa117
+    2300000: drvoKlupa117
+    2300002: farbaKlupa117
+    2300004: srafKlupa117
+    3300000: drvoKlupa117
+    3300002: farbaKlupa117
+    3300004: srafKlupa117
+    4300000: drvoKlupa117
+    4300002: farbaKlupa117
+    4300004: srafKlupa117
   externalObjects: {}
   materials:
     importMaterials: 1

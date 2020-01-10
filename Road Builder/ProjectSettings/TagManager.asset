@@ -10,6 +10,7 @@ TagManager:
   - Intersection
   - Ramp
   - Track
+  - Lamp
   layers:
   - Default
   - TransparentFX

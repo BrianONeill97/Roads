@@ -1,21 +1,22 @@
 fileFormatVersion: 2
-guid: 69dba32267482724ea86d089abb17dc3
+guid: fa3a3286690d2fc41854f8a19341648a
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: default
-    100002: //RootNode
-    400000: default
-    400002: //RootNode
-    2100000: Stone
-    2100002: Asphalt
-    2100004: Grass
-    2100006: Alternate_Dirt.004
-    2100008: Grass.004
-    2100010: defaultMat
-    2300000: default
-    3300000: default
-    4300000: default
+    100000: caixote_lixo_polySurface1_polySurface10
+    100002: polySurface11_caixote_lixo_polySurface1
+    100004: //RootNode
+    400000: caixote_lixo_polySurface1_polySurface10
+    400002: polySurface11_caixote_lixo_polySurface1
+    400004: //RootNode
+    2100000: caixote_lixo_polySurface1_polySurface10Mat
+    2100002: polySurface11_caixote_lixo_polySurface1Mat
+    2300000: caixote_lixo_polySurface1_polySurface10
+    2300002: polySurface11_caixote_lixo_polySurface1
+    3300000: caixote_lixo_polySurface1_polySurface10
+    3300002: polySurface11_caixote_lixo_polySurface1
+    4300000: caixote_lixo_polySurface1_polySurface10
+    4300002: polySurface11_caixote_lixo_polySurface1
   externalObjects: {}
   materials:
     importMaterials: 1

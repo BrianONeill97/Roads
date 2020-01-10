@@ -13,9 +13,14 @@ public class TiledRoadCreator : MonoBehaviour
     GameObject TJunction; 
     GameObject grassTile; 
     GameObject ramp;
+    GameObject roadLamp;
+    GameObject bench;
+    GameObject bin;
 
     public GameObject dropDown;
     public GameObject Canvas;
+
+    public bool Clutter = false;
 
     //Track to be saved
     private GameObject track;
@@ -63,12 +68,12 @@ public class TiledRoadCreator : MonoBehaviour
         //ALTER Y OF THE ROADS
         if (Input.GetKeyUp(KeyCode.UpArrow))
                 {
-                    //RampUp();
+                    RampUp();
                 }
 
         if (Input.GetKeyUp(KeyCode.DownArrow))
                 {
-                    //RampDown();
+                    RampDown();
                 }
 
         if (!EventSystem.current.IsPointerOverGameObject())
@@ -126,6 +131,11 @@ public class TiledRoadCreator : MonoBehaviour
 
                 _isDraging = false;
                 lr.enabled = false;
+
+                if (Clutter == true)
+                {
+                    createClutter(prevDirection);
+                }
             }
         }
 
@@ -340,9 +350,12 @@ public class TiledRoadCreator : MonoBehaviour
                 GameObject objectC = Instantiate(obj, track.transform);
                 objectC.transform.localPosition = location;
                 objectC.transform.localRotation = q;
-                path.Add(objectC);
-                currObj = objectC;
-                tileTag = currObj.gameObject.tag;
+                if (tileTag != "Lamp")
+                {
+                    path.Add(objectC);
+                    currObj = objectC;
+                    tileTag = currObj.gameObject.tag;
+                }
                 return;
             }
 
@@ -359,9 +372,12 @@ public class TiledRoadCreator : MonoBehaviour
                     GameObject objectC = Instantiate(obj, track.transform);
                     objectC.transform.localPosition = location;
                     objectC.transform.localRotation = q;
-                    path.Add(objectC);
-                    currObj = objectC;
-                    tileTag = currObj.gameObject.tag;
+                    if (tileTag != "Lamp")
+                    {
+                        path.Add(objectC);
+                        currObj = objectC;
+                        tileTag = currObj.gameObject.tag;
+                    }
                 }
             }
             else
@@ -370,9 +386,12 @@ public class TiledRoadCreator : MonoBehaviour
                 GameObject objectC = Instantiate(obj, track.transform);
                 objectC.transform.localPosition = location;
                 objectC.transform.localRotation = q;
-                path.Add(objectC);
-                currObj = objectC;
-                tileTag = currObj.gameObject.tag;
+                if (tileTag != "Lamp")
+                {
+                    path.Add(objectC);
+                    currObj = objectC;
+                    tileTag = currObj.gameObject.tag;
+                }
             }
         }
         else
@@ -381,9 +400,12 @@ public class TiledRoadCreator : MonoBehaviour
             GameObject objectC = Instantiate(obj, track.transform);
             objectC.transform.localPosition = location;
             objectC.transform.localRotation = q;
-            path.Add(objectC);
-            currObj = objectC;
-            tileTag = currObj.gameObject.tag;
+            if(tileTag != "Lamp")
+            {
+                path.Add(objectC);
+                currObj = objectC;
+                tileTag = currObj.gameObject.tag;
+            }
         }
     } // Creates a tile 
 
@@ -450,104 +472,137 @@ public class TiledRoadCreator : MonoBehaviour
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "City")
         {
                 Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = false;
-                Debug.Log("City");
                 straightRoad = Resources.Load("City/Road") as GameObject;
                 cornerRoad = Resources.Load("City/corner") as GameObject;
                 intersection = Resources.Load("City/Intersection") as GameObject;
                 TJunction = Resources.Load("City/T-Junction") as GameObject;
                 grassTile = Resources.Load("Plain") as GameObject;
-                ramp = Resources.Load("City/Ramp") as GameObject;            
+                ramp = Resources.Load("City/Ramp") as GameObject;
+                roadLamp = Resources.Load("StreetLamp") as GameObject;
+                bench = Resources.Load("bench") as GameObject;
+                bin = Resources.Load("bin") as GameObject;
         }
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Country")
         {
             Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = false;
-            Debug.Log("Country");
             straightRoad = Resources.Load("Country/Road") as GameObject;
             cornerRoad = Resources.Load("Country/corner") as GameObject;
             intersection = Resources.Load("Country/Intersection") as GameObject;
             TJunction = Resources.Load("Country/T-Junction") as GameObject;
             grassTile = Resources.Load("Plain") as GameObject;
             ramp = Resources.Load("City/Ramp") as GameObject;
+            roadLamp = Resources.Load("StreetLamp") as GameObject;
+            bench = Resources.Load("bench") as GameObject;
+            bin = Resources.Load("bin") as GameObject;
+
+        }
+    }
+
+    void createClutter(string dir)
+    {
+        Debug.Log(path.Count);
+        if(path.Count > 0)
+        {
+            if((path.Count % 2) != 0)
+            {
+                if (path[path.Count - 1].gameObject.tag == "Road")
+                {
+                    if (prevDirection == "left" || prevDirection == "right")
+                    {
+                        createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - 1), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                        return;
+                    }
+                    else if (prevDirection == "up" || prevDirection == "down")
+                    {
+                        createTile(new Vector3(path[path.Count - 1].transform.position.x - 1, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
         }
     }
 
     //Testing functions (NOT PERMANANT)
-    //void RampUp()
-    //{
-    //    if (prevDirection == "right")
-    //    {
-    //        placementPosition.x += (GetSize(ramp).x);
-    //        startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-    //        createTile(placementPosition, ramp, Quaternion.identity);
-    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-    //    }
+    void RampUp()
+    {
+        if (prevDirection == "right")
+        {
+            placementPosition.x += (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.identity,ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
 
-    //    if (prevDirection == "left")
-    //    {
-    //        placementPosition.x -= (GetSize(ramp).x);
-    //        startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0));
-    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-    //    }
+        if (prevDirection == "left")
+        {
+            placementPosition.x -= (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
 
-    //    if (prevDirection == "up")
-    //    {
-    //        placementPosition.z += (GetSize(ramp).z);
-    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0));
-    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-    //    }
+        if (prevDirection == "up")
+        {
+            placementPosition.z += (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
 
-    //    if (prevDirection == "down")
-    //    {
-    //        placementPosition.z -= (GetSize(ramp).z);
-    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0));
-    //        placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-    //    }
-    //}
+        if (prevDirection == "down")
+        {
+            placementPosition.z -= (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
+    }
 
-    //void RampDown()
-    //{
-    //    if (prevDirection == "right")
-    //    {
-    //        placementPosition.x += (GetSize(ramp).x);
-    //        startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0));
-    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-    //    }
+    void RampDown()
+    {
+        if (prevDirection == "right")
+        {
+            placementPosition.x += (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
 
-    //    if (prevDirection == "left")
-    //    {
-    //        placementPosition.x -= (GetSize(ramp).x);
-    //        startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-    //        createTile(placementPosition, ramp, Quaternion.identity);
-    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-    //    }
+        if (prevDirection == "left")
+        {
+            placementPosition.x -= (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.identity, ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
 
-    //    if (prevDirection == "up")
-    //    {
-    //        placementPosition.z += (GetSize(ramp).z);
-    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0));
-    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-    //    }
+        if (prevDirection == "up")
+        {
+            placementPosition.z += (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0),ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
 
-    //    if (prevDirection == "down")
-    //    {
-    //        placementPosition.z -= (GetSize(ramp).z);
-    //        startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
-    //        placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-    //        createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0));
-    //        placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-    //    }
-    //}
+        if (prevDirection == "down")
+        {
+            placementPosition.z -= (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
+    }
 
 }

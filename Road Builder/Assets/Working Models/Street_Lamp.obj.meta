@@ -1,21 +1,17 @@
 fileFormatVersion: 2
-guid: 69dba32267482724ea86d089abb17dc3
+guid: 5b10182668b06e94fb8e891f31280fe3
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: default
-    100002: //RootNode
-    400000: default
-    400002: //RootNode
-    2100000: Stone
-    2100002: Asphalt
-    2100004: Grass
-    2100006: Alternate_Dirt.004
-    2100008: Grass.004
-    2100010: defaultMat
-    2300000: default
-    3300000: default
-    4300000: default
+    100000: //RootNode
+    100002: street_lamp
+    400000: //RootNode
+    400002: street_lamp
+    2100000: street_lampMat
+    2300000: street_lamp
+    3300000: street_lamp
+    4300000: street_lamp
+    2186277476908879412: ImportLogs
   externalObjects: {}
   materials:
     importMaterials: 1
