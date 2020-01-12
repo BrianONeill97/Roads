@@ -17,10 +17,12 @@ public class TiledRoadCreator : MonoBehaviour
     GameObject bench;
     GameObject bin;
 
+    [Header("Options")]
     public GameObject dropDown;
     public GameObject Canvas;
 
     public bool Clutter = false;
+    bool allowCreation = true;
 
     //Track to be saved
     private GameObject track;
@@ -28,6 +30,8 @@ public class TiledRoadCreator : MonoBehaviour
 
     GameObject currObj; // reference to previous object.
     List<GameObject> path = new List<GameObject>(); // List of all the road tiles in the path.
+    List<GameObject> roadSideObjects = new List<GameObject>();
+
     LineRenderer lr; // line renderer
     Camera thisCamera;
 
@@ -62,7 +66,17 @@ public class TiledRoadCreator : MonoBehaviour
 
     void Update()
     {
+
+        foreach(GameObject temp in GameObject.FindGameObjectsWithTag("Lamp"))
+        {
+            roadSideObjects.Add(temp);
+        }
+
         changeTileType();
+        createIntersection();
+        tJunction();
+ 
+
         thisCamera.transform.position = new Vector3(placementPosition.x, thisCamera.transform.position.y, placementPosition.z);
         //KEYBOARD PRESSES
         //ALTER Y OF THE ROADS
@@ -134,13 +148,13 @@ public class TiledRoadCreator : MonoBehaviour
 
                 if (Clutter == true)
                 {
-                    createClutter(prevDirection);
+                    if (allowCreation == true)
+                    {
+                        createClutter(prevDirection);
+                    }
                 }
             }
         }
-
-        createIntersection();
-        tJunction();
     }
 
     //Create the roads
@@ -241,6 +255,7 @@ public class TiledRoadCreator : MonoBehaviour
 
     void createIntersection()
     {
+
         if (path.Count > 1)
         {
             for (int i = 0; i < path.Count; i++)
@@ -333,6 +348,7 @@ public class TiledRoadCreator : MonoBehaviour
     //|  `--'  |     |  |     |  | |  `----.|  |     |  |         |  |        |  |     |  `--'  | |  |\   | |  `----.    |  |     |  | |  `--'  | |  |\   | .----)   |   
     // \______/      |__|     |__| |_______||__|     |__|         |__|        |__|      \______/  |__| \__|  \______|    |__|     |__|  \______/  |__| \__| |_______/  
 
+    // Used to create a tile
     void createTile(Vector3 location, GameObject obj,Quaternion q,string tileTag)
     {
         Collider[] hit = Physics.OverlapSphere(location, 0);
@@ -409,6 +425,7 @@ public class TiledRoadCreator : MonoBehaviour
         }
     } // Creates a tile 
 
+    // Gets the Actual size
     Vector3 GetSize(GameObject obj)
     {
         Vector3 dimensions;
@@ -419,6 +436,7 @@ public class TiledRoadCreator : MonoBehaviour
         return dimensions;
     } // Gets the ACTUAL size of the tile
 
+    //Gets the mouse position in the game
     private Vector3 _get3dMousePosition()
     {
         Vector3 newPos = new Vector3();
@@ -428,12 +446,14 @@ public class TiledRoadCreator : MonoBehaviour
         return newPos;
     } // Gets the mouse position 
 
+    //Gets magnitude
     float GetMag(Vector3 start, Vector3 end)
     {
         float mag = Mathf.Sqrt(((start.x * end.x) + (start.y * start.y) + (start.z * end.z)));
         return mag;
     } // Gets the magnitude of the line Vector
 
+    //Replaces the object with a new objject
     void replaceObject(GameObject obectbeingReplaced, GameObject objectReplacing, Quaternion rot, int placeInList)
     {
         Quaternion rotation = rot;
@@ -442,6 +462,10 @@ public class TiledRoadCreator : MonoBehaviour
         Destroy(currObj);
         createTile(placementPosition, objectReplacing, rot,objectReplacing.gameObject.tag);
         path.Insert(placeInList, currObj);
+        if (Clutter == true)
+        {
+            removeClutter();
+        }
     } // REplace the game object in the list with a new one
 
     void emptyPath()
@@ -500,7 +524,6 @@ public class TiledRoadCreator : MonoBehaviour
 
     void createClutter(string dir)
     {
-        Debug.Log(path.Count);
         if(path.Count > 0)
         {
             if((path.Count % 2) != 0)
@@ -509,12 +532,12 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     if (prevDirection == "left" || prevDirection == "right")
                     {
-                        createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - 1), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                        createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z / 3.5f), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                         return;
                     }
                     else if (prevDirection == "up" || prevDirection == "down")
                     {
-                        createTile(new Vector3(path[path.Count - 1].transform.position.x - 1, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                        createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).z / 3.5f, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                         return;
                     }
                 }
@@ -524,6 +547,28 @@ public class TiledRoadCreator : MonoBehaviour
                 return;
             }
         }
+    }
+
+    void removeClutter()
+    {
+            //Collider[] hit = Physics.OverlapSphere(placementPosition, 2.9f);
+            //if (hit.Length > 0)
+            //{
+            //    for (int i = 0; i < hit.Length; i++)
+            //    {
+            //            if (hit[i].gameObject.tag == "Lamp")
+            //            {
+            //                if (roadSideObjects.Count > 0)
+            //                {
+            //                    if (hit[i].transform.position != roadSideObjects[roadSideObjects.Count].transform.position)
+            //                    {
+            //                        Debug.Log("hit");
+            //                        //Destroy(hit[0]);
+            //                    }
+            //                }
+            //            }
+            //    }
+            //}
     }
 
     //Testing functions (NOT PERMANANT)
@@ -606,3 +651,7 @@ public class TiledRoadCreator : MonoBehaviour
     }
 
 }
+////////
+//TODO:
+//
+////////
