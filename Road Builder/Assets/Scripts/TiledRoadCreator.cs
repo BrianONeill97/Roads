@@ -21,6 +21,10 @@ public class TiledRoadCreator : MonoBehaviour
     public GameObject dropDown;
     public GameObject Canvas;
 
+    [Header("Grid Options")]
+    public int gridX = 10;
+    public int gridZ = 10;
+
     public bool Clutter = false;
     bool allowCreation = true;
 
@@ -30,7 +34,7 @@ public class TiledRoadCreator : MonoBehaviour
 
     GameObject currObj; // reference to previous object.
     List<GameObject> path = new List<GameObject>(); // List of all the road tiles in the path.
-    List<GameObject> roadSideObjects = new List<GameObject>();
+    List<GameObject> plains = new List<GameObject>();
 
     LineRenderer lr; // line renderer
     Camera thisCamera;
@@ -51,6 +55,7 @@ public class TiledRoadCreator : MonoBehaviour
 
     private void Awake()
     {
+
         //straightRoad = Resources.Load("City/Road") as GameObject;
         //cornerRoad = Resources.Load("City/corner") as GameObject;
         //intersection = Resources.Load("City/Intersection") as GameObject;
@@ -62,16 +67,11 @@ public class TiledRoadCreator : MonoBehaviour
         lr = gameObject.GetComponent<LineRenderer>();
         track = new GameObject("Track" + trackNumber);
         track.gameObject.tag = "Track";
+
     }
 
     void Update()
     {
-
-        foreach(GameObject temp in GameObject.FindGameObjectsWithTag("Lamp"))
-        {
-            roadSideObjects.Add(temp);
-        }
-
         changeTileType();
         createIntersection();
         tJunction();
@@ -98,16 +98,33 @@ public class TiledRoadCreator : MonoBehaviour
             {
                 if (started == false)//After the first tile of the road has been placed
                 {
-                    //Creates first tile,Sets the directional tools start point
-                    startPoint = _get3dMousePosition();
-                    createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
-                    placementPosition = startPoint;
+                    Collider[] hits = Physics.OverlapSphere(_get3dMousePosition(), 0.0f); ;
+
+                    if (hits.Length > 0)
+                    {
+                        startPoint = hits[0].gameObject.transform.position;
+                        createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
+                        placementPosition = startPoint;
+                    }
                     started = true;
+                }
+                
+                if(started == true)
+                {
+                    if(plains.Count > 0)
+                    {
+                        for(int i = 0; i < plains.Count; i++)
+                        {
+                            plains[i].gameObject.GetComponent<mouseEvents>().allowChange = false;
+                            plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
+
+                        }
+                    }
                 }
                 // shows the tool when held 
                 lr.enabled = true;
                 lr.positionCount = 2;
-                lr.SetPosition(0, startPoint);
+                lr.SetPosition(0, new Vector3(startPoint.x, startPoint.y + 2, startPoint.z));
 
                 _isDraging = true;
             }
@@ -117,7 +134,7 @@ public class TiledRoadCreator : MonoBehaviour
                 //Gets the position of the mouse
                 Vector3 dir = _get3dMousePosition() - startPoint;
                 selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-                lr.SetPosition(1, _get3dMousePosition());
+                lr.SetPosition(1, new Vector3(_get3dMousePosition().x, _get3dMousePosition().y + 2, _get3dMousePosition().z));
             }
             //Gets the angle of the line and then selects the road from that.
             if (Input.GetMouseButtonUp(0))
@@ -142,10 +159,6 @@ public class TiledRoadCreator : MonoBehaviour
                     ChooseDirectionRoads(straightRoad, "up");
                     prevDirection = "up";
                 }
-
-                _isDraging = false;
-                lr.enabled = false;
-
                 if (Clutter == true)
                 {
                     if (allowCreation == true)
@@ -153,7 +166,14 @@ public class TiledRoadCreator : MonoBehaviour
                         createClutter(prevDirection);
                     }
                 }
+                _isDraging = false;
+                lr.enabled = false;
             }
+        }
+
+        if (Clutter == true)
+        {
+            removeClutter();
         }
     }
 
@@ -354,12 +374,14 @@ public class TiledRoadCreator : MonoBehaviour
         Collider[] hit = Physics.OverlapSphere(location, 0);
         if (hit.Length > 0 )
         {
+            //checks if the object hit was an intersection and if it was dont change it as you shouldnt be able too
             if(hit[0].gameObject.tag == "Intersection")
             {
                 tileTag = "";
                 return;
             }
 
+            // Checks if the object thats been hit is a corner
             if (hit[0].gameObject.tag == "Corner")
             {
                 rot = q;
@@ -375,12 +397,32 @@ public class TiledRoadCreator : MonoBehaviour
                 return;
             }
 
+            // checks the current tile 
             if (tileTag == "Road")
             {
-                if(hit[0].transform.localRotation == q)
-                { 
-                    tileTag = "";
-                    return;
+                // checks the object i just hit, Check if its rotation is the same and if it is then dont make another one
+                if (hit[0].gameObject.tag != "Plain")
+                {
+
+
+                    if (hit[0].transform.localRotation == q)
+                    {
+                        tileTag = "";
+                        return;
+                    }
+                    else // otherwise create a new one( this is where the intersection is made )
+                    {
+                        rot = q;
+                        GameObject objectC = Instantiate(obj, track.transform);
+                        objectC.transform.localPosition = location;
+                        objectC.transform.localRotation = q;
+                        if (tileTag != "Lamp")
+                        {
+                            path.Add(objectC);
+                            currObj = objectC;
+                            tileTag = currObj.gameObject.tag;
+                        }
+                    }
                 }
                 else
                 {
@@ -396,7 +438,7 @@ public class TiledRoadCreator : MonoBehaviour
                     }
                 }
             }
-            else
+            else // if the current tile is not a road then just create it 
             {
                 rot = q;
                 GameObject objectC = Instantiate(obj, track.transform);
@@ -410,7 +452,7 @@ public class TiledRoadCreator : MonoBehaviour
                 }
             }
         }
-        else
+        else // if nothing is hit hten just create normally 
         {
             rot = q;
             GameObject objectC = Instantiate(obj, track.transform);
@@ -441,7 +483,7 @@ public class TiledRoadCreator : MonoBehaviour
     {
         Vector3 newPos = new Vector3();
         newPos = Input.mousePosition;
-        newPos.z = (thisCamera.farClipPlane - 5) / 2;
+        newPos.z = /*(thisCamera.farClipPlane - 5) / 2*/thisCamera.farClipPlane;
         newPos = thisCamera.ScreenToWorldPoint(newPos);
         return newPos;
     } // Gets the mouse position 
@@ -462,10 +504,6 @@ public class TiledRoadCreator : MonoBehaviour
         Destroy(currObj);
         createTile(placementPosition, objectReplacing, rot,objectReplacing.gameObject.tag);
         path.Insert(placeInList, currObj);
-        if (Clutter == true)
-        {
-            removeClutter();
-        }
     } // REplace the game object in the list with a new one
 
     void emptyPath()
@@ -482,8 +520,17 @@ public class TiledRoadCreator : MonoBehaviour
     {
         emptyPath();
         Destroy(currObj);
-        //started = false;
+        started = false;
         track = new GameObject("Track" + trackNumber);
+
+        if (plains.Count > 0)
+        {
+            for (int i = 0; i < plains.Count; i++)
+            {
+                plains[i].gameObject.GetComponent<mouseEvents>().allowChange = true;
+                plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
+            }
+        }
     }
 
     void changeTileType()
@@ -495,16 +542,16 @@ public class TiledRoadCreator : MonoBehaviour
 
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "City")
         {
-                Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = false;
-                straightRoad = Resources.Load("City/Road") as GameObject;
-                cornerRoad = Resources.Load("City/corner") as GameObject;
-                intersection = Resources.Load("City/Intersection") as GameObject;
-                TJunction = Resources.Load("City/T-Junction") as GameObject;
-                grassTile = Resources.Load("Plain") as GameObject;
-                ramp = Resources.Load("City/Ramp") as GameObject;
-                roadLamp = Resources.Load("StreetLamp") as GameObject;
-                bench = Resources.Load("bench") as GameObject;
-                bin = Resources.Load("bin") as GameObject;
+            Canvas.transform.GetChild(0).gameObject.GetComponent<Text>().enabled = false;
+            straightRoad = Resources.Load("City/Road") as GameObject;
+            cornerRoad = Resources.Load("City/corner") as GameObject;
+            intersection = Resources.Load("City/Intersection") as GameObject;
+            TJunction = Resources.Load("City/T-Junction") as GameObject;
+            grassTile = Resources.Load("Plain") as GameObject;
+            ramp = Resources.Load("City/Ramp") as GameObject;
+            roadLamp = Resources.Load("StreetLamp") as GameObject;
+            bench = Resources.Load("bench") as GameObject;
+            bin = Resources.Load("bin") as GameObject;
         }
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Country")
         {
@@ -518,7 +565,6 @@ public class TiledRoadCreator : MonoBehaviour
             roadLamp = Resources.Load("StreetLamp") as GameObject;
             bench = Resources.Load("bench") as GameObject;
             bin = Resources.Load("bin") as GameObject;
-
         }
     }
 
@@ -551,24 +597,27 @@ public class TiledRoadCreator : MonoBehaviour
 
     void removeClutter()
     {
-            //Collider[] hit = Physics.OverlapSphere(placementPosition, 2.9f);
-            //if (hit.Length > 0)
-            //{
-            //    for (int i = 0; i < hit.Length; i++)
-            //    {
-            //            if (hit[i].gameObject.tag == "Lamp")
-            //            {
-            //                if (roadSideObjects.Count > 0)
-            //                {
-            //                    if (hit[i].transform.position != roadSideObjects[roadSideObjects.Count].transform.position)
-            //                    {
-            //                        Debug.Log("hit");
-            //                        //Destroy(hit[0]);
-            //                    }
-            //                }
-            //            }
-            //    }
-            //}
+        if (currObj != null)
+        {
+            if (currObj.gameObject.tag == "Intersection")
+            {
+                Collider[] hit = Physics.OverlapSphere(currObj.transform.localPosition, 1.5f);
+                if (hit.Length > 0)
+                {
+                    for (int i = 0; i < hit.Length; i++)
+                    {
+                        if (hit[i].gameObject.tag == "Lamp")
+                        {
+                            Destroy(hit[i].gameObject);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
     }
 
     //Testing functions (NOT PERMANANT)
@@ -650,8 +699,22 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
+    public void createBlank()
+    {
+        for(int x = 0; x < gridX; x++)
+        {
+            for(int z = 0; z < gridZ; z ++)
+            {
+                GameObject temp = Instantiate(grassTile, new Vector3(x * GetSize(grassTile).x, 0, z * GetSize(grassTile).z),Quaternion.identity);
+                plains.Add(temp);
+            }
+        }
+    }
+
 }
 ////////
 //TODO:
-//
+// // Fix the position of the tiles in relation to the camera
+// // Delete the plain everytime I create a new road 
+// // Place the plains tiles in a container object
 ////////
