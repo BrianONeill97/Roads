@@ -13,9 +13,11 @@ public class FloodFill : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyUp(KeyCode.Space))
+        Collider[] hits = Physics.OverlapSphere(GetComponent<TiledRoadCreator>()._get3dMousePosition(), 0.0f); ;
+
+        if (Input.GetKeyUp(KeyCode.Space))
         {
-            floodFill(transform.position);
+            floodFill(hits[0].transform.position);
 
         }
     }
@@ -25,13 +27,14 @@ public class FloodFill : MonoBehaviour
         Debug.Log(pos);
         Collider[] hit = Physics.OverlapSphere(pos,0);
 
-        if (hit.Length == 0)
+        if (hit[0].gameObject.tag != "Road")
         {
-            Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), pos, Quaternion.identity);
-            floodFill(new Vector3(pos.x + 1, pos.y, pos.z));
-            floodFill(new Vector3(pos.x, pos.y, pos.z + 1));
-            floodFill(new Vector3(pos.x - 1, pos.y, pos.z));
-            floodFill(new Vector3(pos.x, pos.y, pos.z - 1));
+
+            //Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), pos, Quaternion.identity);
+            floodFill(new Vector3(pos.x + GetComponent<TiledRoadCreator>().GetSize(hit[0].gameObject).x, pos.y, pos.z));
+            floodFill(new Vector3(pos.x, pos.y, pos.z + GetComponent<TiledRoadCreator>().GetSize(hit[0].gameObject).z));
+            floodFill(new Vector3(pos.x - GetComponent<TiledRoadCreator>().GetSize(hit[0].gameObject).x, pos.y, pos.z));
+            floodFill(new Vector3(pos.x, pos.y, pos.z - GetComponent<TiledRoadCreator>().GetSize(hit[0].gameObject).z));
         }
     }
 }

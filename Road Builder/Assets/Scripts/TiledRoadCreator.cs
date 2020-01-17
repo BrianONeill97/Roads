@@ -55,28 +55,21 @@ public class TiledRoadCreator : MonoBehaviour
 
     private void Awake()
     {
-
-        //straightRoad = Resources.Load("City/Road") as GameObject;
-        //cornerRoad = Resources.Load("City/corner") as GameObject;
-        //intersection = Resources.Load("City/Intersection") as GameObject;
-        //TJunction = Resources.Load("City/T-Junction") as GameObject;
-        //grassTile = Resources.Load("Plain") as GameObject;
-        //ramp = Resources.Load("City/Ramp") as GameObject;
-
+        grassTile = Resources.Load("Plain") as GameObject;
+        ramp = Resources.Load("City/Ramp") as GameObject;
+        roadLamp = Resources.Load("StreetLamp") as GameObject;
+        bench = Resources.Load("bench") as GameObject;
+        bin = Resources.Load("bin") as GameObject;
         thisCamera = Camera.main;
         lr = gameObject.GetComponent<LineRenderer>();
         track = new GameObject("Track" + trackNumber);
         track.gameObject.tag = "Track";
 
+        createBlank();
     }
 
     void Update()
-    {
-        changeTileType();
-        createIntersection();
-        tJunction();
- 
-
+    { 
         thisCamera.transform.position = new Vector3(placementPosition.x, thisCamera.transform.position.y, placementPosition.z);
         //KEYBOARD PRESSES
         //ALTER Y OF THE ROADS
@@ -90,6 +83,7 @@ public class TiledRoadCreator : MonoBehaviour
                     RampDown();
                 }
 
+        //Mouse Events
         if (!EventSystem.current.IsPointerOverGameObject())
         {
             //MOUSE PRESSES
@@ -109,18 +103,20 @@ public class TiledRoadCreator : MonoBehaviour
                     started = true;
                 }
                 
-                if(started == true)
-                {
-                    if(plains.Count > 0)
-                    {
-                        for(int i = 0; i < plains.Count; i++)
-                        {
-                            plains[i].gameObject.GetComponent<mouseEvents>().allowChange = false;
-                            plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
-
-                        }
-                    }
-                }
+                //if(started == true)
+                //{
+                //    if(plains.Count > 0)
+                //    {
+                //        for(int i = 0; i < plains.Count; i++)
+                //        {
+                //            if (plains[i] != null)
+                //            {
+                //                plains[i].gameObject.GetComponent<mouseEvents>().allowChange = false;
+                //                plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
+                //            }
+                //        }
+                //    }
+                //}
                 // shows the tool when held 
                 lr.enabled = true;
                 lr.positionCount = 2;
@@ -175,6 +171,10 @@ public class TiledRoadCreator : MonoBehaviour
         {
             removeClutter();
         }
+
+        changeTileType();
+        createIntersection();
+        tJunction();
     }
 
     //Create the roads
@@ -371,6 +371,8 @@ public class TiledRoadCreator : MonoBehaviour
     // Used to create a tile
     void createTile(Vector3 location, GameObject obj,Quaternion q,string tileTag)
     {
+        //hit[0] is the object thats been hit 
+        // tileTag is the object that is being created
         Collider[] hit = Physics.OverlapSphere(location, 0);
         if (hit.Length > 0 )
         {
@@ -403,29 +405,30 @@ public class TiledRoadCreator : MonoBehaviour
                 // checks the object i just hit, Check if its rotation is the same and if it is then dont make another one
                 if (hit[0].gameObject.tag != "Plain")
                 {
-
-
-                    if (hit[0].transform.localRotation == q)
-                    {
-                        tileTag = "";
-                        return;
-                    }
-                    else // otherwise create a new one( this is where the intersection is made )
-                    {
-                        rot = q;
-                        GameObject objectC = Instantiate(obj, track.transform);
-                        objectC.transform.localPosition = location;
-                        objectC.transform.localRotation = q;
-                        if (tileTag != "Lamp")
+                        if (hit[0].transform.localRotation == q)
                         {
-                            path.Add(objectC);
-                            currObj = objectC;
-                            tileTag = currObj.gameObject.tag;
+                            return;
                         }
-                    }
+                        else // otherwise create a new one( this is where the intersection is made )
+                        {
+                            rot = q;
+                            GameObject objectC = Instantiate(obj, track.transform);
+                            objectC.transform.localPosition = location;
+                            objectC.transform.localRotation = q;
+                            if (tileTag != "Lamp")
+                            {
+                                path.Add(objectC);
+                                currObj = objectC;
+                                tileTag = currObj.gameObject.tag;
+                            }
+                        }             
                 }
                 else
                 {
+                    if (hit[0].gameObject.tag == "Plain")
+                    {
+                        Destroy(hit[0].gameObject);
+                    }
                     rot = q;
                     GameObject objectC = Instantiate(obj, track.transform);
                     objectC.transform.localPosition = location;
@@ -440,6 +443,10 @@ public class TiledRoadCreator : MonoBehaviour
             }
             else // if the current tile is not a road then just create it 
             {
+                if (hit[0].gameObject.tag == "Plain")
+                {
+                    Destroy(hit[0].gameObject);
+                }
                 rot = q;
                 GameObject objectC = Instantiate(obj, track.transform);
                 objectC.transform.localPosition = location;
@@ -468,7 +475,7 @@ public class TiledRoadCreator : MonoBehaviour
     } // Creates a tile 
 
     // Gets the Actual size
-    Vector3 GetSize(GameObject obj)
+    public Vector3 GetSize(GameObject obj)
     {
         Vector3 dimensions;
         float width = obj.GetComponent<Renderer>().bounds.size.x * transform.localScale.x;
@@ -479,7 +486,7 @@ public class TiledRoadCreator : MonoBehaviour
     } // Gets the ACTUAL size of the tile
 
     //Gets the mouse position in the game
-    private Vector3 _get3dMousePosition()
+    public Vector3 _get3dMousePosition()
     {
         Vector3 newPos = new Vector3();
         newPos = Input.mousePosition;
@@ -522,13 +529,16 @@ public class TiledRoadCreator : MonoBehaviour
         Destroy(currObj);
         started = false;
         track = new GameObject("Track" + trackNumber);
-
+        createBlank();
         if (plains.Count > 0)
         {
             for (int i = 0; i < plains.Count; i++)
             {
-                plains[i].gameObject.GetComponent<mouseEvents>().allowChange = true;
-                plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
+                if (plains[i] != null)
+                {
+                    plains[i].gameObject.GetComponent<mouseEvents>().allowChange = true;
+                    plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
+                }
             }
         }
     }
@@ -547,11 +557,7 @@ public class TiledRoadCreator : MonoBehaviour
             cornerRoad = Resources.Load("City/corner") as GameObject;
             intersection = Resources.Load("City/Intersection") as GameObject;
             TJunction = Resources.Load("City/T-Junction") as GameObject;
-            grassTile = Resources.Load("Plain") as GameObject;
-            ramp = Resources.Load("City/Ramp") as GameObject;
-            roadLamp = Resources.Load("StreetLamp") as GameObject;
-            bench = Resources.Load("bench") as GameObject;
-            bin = Resources.Load("bin") as GameObject;
+
         }
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Country")
         {
@@ -560,11 +566,6 @@ public class TiledRoadCreator : MonoBehaviour
             cornerRoad = Resources.Load("Country/corner") as GameObject;
             intersection = Resources.Load("Country/Intersection") as GameObject;
             TJunction = Resources.Load("Country/T-Junction") as GameObject;
-            grassTile = Resources.Load("Plain") as GameObject;
-            ramp = Resources.Load("City/Ramp") as GameObject;
-            roadLamp = Resources.Load("StreetLamp") as GameObject;
-            bench = Resources.Load("bench") as GameObject;
-            bin = Resources.Load("bin") as GameObject;
         }
     }
 
@@ -705,7 +706,10 @@ public class TiledRoadCreator : MonoBehaviour
         {
             for(int z = 0; z < gridZ; z ++)
             {
-                GameObject temp = Instantiate(grassTile, new Vector3(x * GetSize(grassTile).x, 0, z * GetSize(grassTile).z),Quaternion.identity);
+                Vector3 tempVec = new Vector3(placementPosition.x + ((gridX / 2) * GetSize(grassTile).x) - (x * GetSize(grassTile).x), 0, placementPosition.z + ((gridZ / 2) * GetSize(grassTile).z) - (z * GetSize(grassTile).z));
+                GameObject temp = Instantiate(grassTile, track.transform);
+                temp.transform.localPosition = tempVec;
+                temp.transform.localRotation = Quaternion.identity;
                 plains.Add(temp);
             }
         }
@@ -714,7 +718,5 @@ public class TiledRoadCreator : MonoBehaviour
 }
 ////////
 //TODO:
-// // Fix the position of the tiles in relation to the camera
-// // Delete the plain everytime I create a new road 
-// // Place the plains tiles in a container object
+// // Delete Duplicate tiles 
 ////////
