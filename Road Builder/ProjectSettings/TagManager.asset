@@ -11,6 +11,9 @@ TagManager:
   - Ramp
   - Track
   - Lamp
+  - Plain
+  - Tree
+  - House
   layers:
   - Default
   - TransparentFX

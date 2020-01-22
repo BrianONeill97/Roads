@@ -16,6 +16,8 @@ public class TiledRoadCreator : MonoBehaviour
     GameObject roadLamp;
     GameObject bench;
     GameObject bin;
+    GameObject tree;
+    GameObject house;
 
     [Header("Options")]
     public GameObject dropDown;
@@ -59,6 +61,8 @@ public class TiledRoadCreator : MonoBehaviour
         ramp = Resources.Load("City/Ramp") as GameObject;
         roadLamp = Resources.Load("StreetLamp") as GameObject;
         bench = Resources.Load("bench") as GameObject;
+        tree = Resources.Load("tree") as GameObject;
+
         bin = Resources.Load("bin") as GameObject;
         thisCamera = Camera.main;
         lr = gameObject.GetComponent<LineRenderer>();
@@ -103,20 +107,6 @@ public class TiledRoadCreator : MonoBehaviour
                     started = true;
                 }
                 
-                //if(started == true)
-                //{
-                //    if(plains.Count > 0)
-                //    {
-                //        for(int i = 0; i < plains.Count; i++)
-                //        {
-                //            if (plains[i] != null)
-                //            {
-                //                plains[i].gameObject.GetComponent<mouseEvents>().allowChange = false;
-                //                plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
-                //            }
-                //        }
-                //    }
-                //}
                 // shows the tool when held 
                 lr.enabled = true;
                 lr.positionCount = 2;
@@ -175,6 +165,7 @@ public class TiledRoadCreator : MonoBehaviour
         changeTileType();
         createIntersection();
         tJunction();
+        spawnBuilding();
     }
 
     //Create the roads
@@ -184,28 +175,28 @@ public class TiledRoadCreator : MonoBehaviour
         {
             //Moving Right
             case "right":
-                if(prevDirection == "up")
+                if(prevDirection == "up") // places a turning right corner if you where moving up
                 {
                     placementPosition.z += (GetSize(cornerRoad).z); // moves placement for road
                     startPoint = new Vector3(placementPosition.x + GetSize(cornerRoad).x, placementPosition.y, placementPosition.z); // moves startpoint
                     createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 270.0f, 0.0f),cornerRoad.gameObject.tag);
                     prevDirection = "";
-                } // if moving up this turns you right
-                else if(prevDirection == "down")
+                }
+                else if(prevDirection == "down") // if you where last moving down then this turns you right
                 {
                     placementPosition.z -= (GetSize(cornerRoad).z);
                     startPoint = new Vector3(placementPosition.x + GetSize(cornerRoad).x, placementPosition.y, placementPosition.z);
                     createTile(placementPosition, cornerRoad, Quaternion.Euler(0.0f, 180.0f, 0.0f),cornerRoad.gameObject.tag);
                     prevDirection = "";
-                }// if moving down this turns you right
-                else
+                }
+                else // normally moves you right
                 {
                     placementPosition.x += (GetSize(obj).x);
                     startPoint = new Vector3(placementPosition.x + GetSize(obj).x, placementPosition.y, placementPosition.z);
                     createTile(placementPosition, obj, Quaternion.identity,obj.gameObject.tag);
-                } // otherwise just move right normally
+                }
                 break;
-
+            //Move you left 
             case "left":
                 if(prevDirection == "up")
                 {
@@ -228,7 +219,7 @@ public class TiledRoadCreator : MonoBehaviour
                     createTile(placementPosition, obj, Quaternion.identity,obj.gameObject.tag);
                 }// otherwise just move left normally
                 break;
-
+            //Moves you up
             case "up":
                 if(prevDirection == "right")
                 {
@@ -249,7 +240,7 @@ public class TiledRoadCreator : MonoBehaviour
                     createTile(placementPosition, obj, Quaternion.Euler(0.0f, 90.0f, 0.0f),obj.gameObject.tag);
                 } // move up normally 
                 break;
-
+            //Moves you down
             case "down":
                 if(prevDirection == "right")
                 {
@@ -490,7 +481,7 @@ public class TiledRoadCreator : MonoBehaviour
     {
         Vector3 newPos = new Vector3();
         newPos = Input.mousePosition;
-        newPos.z = /*(thisCamera.farClipPlane - 5) / 2*/thisCamera.farClipPlane;
+        newPos.z = thisCamera.farClipPlane;
         newPos = thisCamera.ScreenToWorldPoint(newPos);
         return newPos;
     } // Gets the mouse position 
@@ -557,6 +548,7 @@ public class TiledRoadCreator : MonoBehaviour
             cornerRoad = Resources.Load("City/corner") as GameObject;
             intersection = Resources.Load("City/Intersection") as GameObject;
             TJunction = Resources.Load("City/T-Junction") as GameObject;
+            house = Resources.Load("City/House") as GameObject;
 
         }
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Country")
@@ -600,17 +592,30 @@ public class TiledRoadCreator : MonoBehaviour
     {
         if (currObj != null)
         {
-            if (currObj.gameObject.tag == "Intersection")
+
+            Collider[] hit = Physics.OverlapSphere(currObj.transform.localPosition, 1.5f);
+            if (hit.Length > 0)
             {
-                Collider[] hit = Physics.OverlapSphere(currObj.transform.localPosition, 1.5f);
-                if (hit.Length > 0)
+                for (int i = 0; i < hit.Length; i++)
                 {
-                    for (int i = 0; i < hit.Length; i++)
+                    if (currObj.gameObject.tag == "Intersection")
                     {
                         if (hit[i].gameObject.tag == "Lamp")
                         {
                             Destroy(hit[i].gameObject);
+
                         }
+                    }
+
+                    if (hit[i].gameObject.tag == "Tree")
+                    {
+                        Destroy(hit[i].gameObject);
+                    }
+
+                    if (hit[i].gameObject.tag == "House")
+                    {
+                        Debug.Log("hit house");
+                        Destroy(hit[i].gameObject);
                     }
                 }
             }
@@ -715,8 +720,58 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
+    void spawnBuilding()
+    {
+
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            for (int i = 0; i < plains.Count; i++)
+            {
+                int num = Random.Range(0, 100);
+
+                if (plains[i] != null)
+                {
+                    if (num < 5)
+                    {
+                        GameObject treeTemp = Instantiate(tree, track.transform);
+                        treeTemp.transform.localPosition = plains[i].transform.localPosition;
+                        treeTemp.transform.localRotation = Quaternion.identity;
+                    }
+
+                    if (num > 95)
+                    {
+                        GameObject houseTemp = Instantiate(house, track.transform);
+                        houseTemp.transform.localPosition = plains[i].transform.localPosition + new Vector3(0, GetSize(house).y / 12, 0); 
+                        houseTemp.transform.localRotation = Quaternion.identity;
+                    }
+                    else
+                    {
+                        plains.RemoveAt(i);
+                    }
+                }
+            }
+        }
+    }
 }
 ////////
 //TODO:
 // // Delete Duplicate tiles 
+// // Possibly move lamp and tree creation to seperate functions to alleviate the code base in here
 ////////
+///
+/// line 101
+//
+//if(started == true)
+//{
+//    if(plains.Count > 0)
+//    {
+//        for(int i = 0; i < plains.Count; i++)
+//        {
+//            if (plains[i] != null)
+//            {
+//                plains[i].gameObject.GetComponent<mouseEvents>().allowChange = false;
+//                plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
+//            }
+//        }
+//    }
+//}
