@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class TiledRoadCreator : MonoBehaviour
 {
-    [Header("Objects")]
     GameObject straightRoad;
     GameObject cornerRoad;
     GameObject intersection;
@@ -27,8 +26,10 @@ public class TiledRoadCreator : MonoBehaviour
     public int gridX = 10;
     public int gridZ = 10;
 
+    [Header("Spawning")]
+    public int SpawnChance = 33;
+
     public bool Clutter = false;
-    bool allowCreation = true;
 
     //Track to be saved
     private GameObject track;
@@ -147,10 +148,8 @@ public class TiledRoadCreator : MonoBehaviour
                 }
                 if (Clutter == true)
                 {
-                    if (allowCreation == true)
-                    {
-                        createClutter(prevDirection);
-                    }
+                        createClutter();
+                        spawnBuilding();
                 }
                 _isDraging = false;
                 lr.enabled = false;
@@ -165,7 +164,7 @@ public class TiledRoadCreator : MonoBehaviour
         changeTileType();
         createIntersection();
         tJunction();
-        spawnBuilding();
+        spawnTrees();
     }
 
     //Create the roads
@@ -561,7 +560,7 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-    void createClutter(string dir)
+    void createClutter()
     {
         if(path.Count > 0)
         {
@@ -722,7 +721,47 @@ public class TiledRoadCreator : MonoBehaviour
 
     void spawnBuilding()
     {
+        if (path.Count > 0)
+        {
+            int num = Random.Range(0, 100);
 
+            if (num < SpawnChance)
+            {
+                if (path[path.Count - 1].gameObject.tag == "Road")
+                {
+                    if (num < SpawnChance / 2)
+                    {
+                        if (prevDirection == "left" || prevDirection == "right")
+                        {
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            return;
+                        }
+                        else if (prevDirection == "up" || prevDirection == "down")
+                        {
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            return;
+                        }
+                    }
+                    if (num < SpawnChance && num > SpawnChance / 2)
+                    {
+                        if (prevDirection == "left" || prevDirection == "right")
+                        {
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            return;
+                        }
+                        else if (prevDirection == "up" || prevDirection == "down")
+                        {
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            return;
+                        }
+                    }
+            }
+            }
+        }
+    }
+
+    void spawnTrees()
+    {
         if (Input.GetKeyUp(KeyCode.Space))
         {
             for (int i = 0; i < plains.Count; i++)
@@ -736,13 +775,6 @@ public class TiledRoadCreator : MonoBehaviour
                         GameObject treeTemp = Instantiate(tree, track.transform);
                         treeTemp.transform.localPosition = plains[i].transform.localPosition;
                         treeTemp.transform.localRotation = Quaternion.identity;
-                    }
-
-                    if (num > 95)
-                    {
-                        GameObject houseTemp = Instantiate(house, track.transform);
-                        houseTemp.transform.localPosition = plains[i].transform.localPosition + new Vector3(0, GetSize(house).y / 12, 0); 
-                        houseTemp.transform.localRotation = Quaternion.identity;
                     }
                     else
                     {

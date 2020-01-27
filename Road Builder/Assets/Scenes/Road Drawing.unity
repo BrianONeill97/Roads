@@ -1023,6 +1023,7 @@ MonoBehaviour:
   Canvas: {fileID: 940106606}
   gridX: 40
   gridZ: 40
+  SpawnChance: 50
   Clutter: 1
 --- !u!4 &1034010785
 Transform:
