@@ -14,6 +14,7 @@ TagManager:
   - Plain
   - Tree
   - House
+  - Wave
   layers:
   - Default
   - TransparentFX

@@ -11,7 +11,10 @@ GameObject:
   - component: {fileID: 4021494074433550}
   - component: {fileID: 33529942281730320}
   - component: {fileID: 23929722689121438}
-  - component: {fileID: 64815816450274640}
+  - component: {fileID: 1346236937184014336}
+  - component: {fileID: 8540419215438814864}
+  - component: {fileID: 1782731722461716822}
+  - component: {fileID: 6907038943659171496}
   m_Layer: 0
   m_Name: tree
   m_TagString: Tree
@@ -79,7 +82,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &64815816450274640
+--- !u!114 &1346236937184014336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335726306580732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09c00e4295bf1a4599eeec569235618, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!64 &8540419215438814864
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -90,6 +105,35 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: 1fc71d46bd91b21459596d37ee587fe2, type: 3}
+--- !u!65 &1782731722461716822
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335726306580732}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 1.9032831, y: 4.062479, z: 1.6923246}
+  m_Center: {x: 0.028001308, y: 1.5997367, z: -0.17188215}
+--- !u!54 &6907038943659171496
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335726306580732}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0

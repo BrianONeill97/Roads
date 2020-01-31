@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,8 +8,9 @@ public class TiledRoadCreator : MonoBehaviour
     GameObject straightRoad;
     GameObject cornerRoad;
     GameObject intersection;
-    GameObject TJunction; 
-    GameObject grassTile; 
+    GameObject TJunction;
+    [HideInInspector]
+    public GameObject grassTile; 
     GameObject ramp;
     GameObject roadLamp;
     GameObject bench;
@@ -27,9 +27,13 @@ public class TiledRoadCreator : MonoBehaviour
     public int gridZ = 10;
 
     [Header("Spawning")]
-    public int SpawnChance = 33;
+    [Range(0.0f,100.0f)]
+    public int BuildingSpawnChance = 33;
+    [Range(0.0f, 100.0f)]
+    public int TreeSpawnChance = 10;
 
-    public bool Clutter = false;
+
+    public bool LampPosts = false;
 
     //Track to be saved
     private GameObject track;
@@ -37,13 +41,17 @@ public class TiledRoadCreator : MonoBehaviour
 
     GameObject currObj; // reference to previous object.
     List<GameObject> path = new List<GameObject>(); // List of all the road tiles in the path.
-    List<GameObject> plains = new List<GameObject>();
+
+    [HideInInspector]
+    public List<GameObject> plains = new List<GameObject>();
 
     LineRenderer lr; // line renderer
     Camera thisCamera;
 
     private bool _isDraging = false; // Bool for if im dragging
     bool started = false; // turns off the start.
+    bool lakeCreated = false;
+
 
     //Variables for Placement
     Quaternion rot;
@@ -55,6 +63,9 @@ public class TiledRoadCreator : MonoBehaviour
     string prevDirection = ""; // previous direction moved in.
     static int trackNumber = 0;
 
+    [HideInInspector]
+    public int randTile = 0;
+
 
     private void Awake()
     {
@@ -64,6 +75,7 @@ public class TiledRoadCreator : MonoBehaviour
         bench = Resources.Load("bench") as GameObject;
         tree = Resources.Load("tree") as GameObject;
 
+
         bin = Resources.Load("bin") as GameObject;
         thisCamera = Camera.main;
         lr = gameObject.GetComponent<LineRenderer>();
@@ -71,10 +83,13 @@ public class TiledRoadCreator : MonoBehaviour
         track.gameObject.tag = "Track";
 
         createBlank();
+        spawnTrees();
+
+        randTile = Random.Range(0, plains.Count);
     }
 
     void Update()
-    { 
+    {
         thisCamera.transform.position = new Vector3(placementPosition.x, thisCamera.transform.position.y, placementPosition.z);
         //KEYBOARD PRESSES
         //ALTER Y OF THE ROADS
@@ -146,7 +161,7 @@ public class TiledRoadCreator : MonoBehaviour
                     ChooseDirectionRoads(straightRoad, "up");
                     prevDirection = "up";
                 }
-                if (Clutter == true)
+                if (LampPosts == true)
                 {
                         createClutter();
                         spawnBuilding();
@@ -156,15 +171,11 @@ public class TiledRoadCreator : MonoBehaviour
             }
         }
 
-        if (Clutter == true)
-        {
-            removeClutter();
-        }
-
         changeTileType();
         createIntersection();
         tJunction();
-        spawnTrees();
+        removeSpawnedObjects();
+
     }
 
     //Create the roads
@@ -270,36 +281,39 @@ public class TiledRoadCreator : MonoBehaviour
         {
             for (int i = 0; i < path.Count; i++)
             {
-                if (path[i] != null)
+                if (currObj != null)
                 {
-                    if (Mathf.Approximately(path[i].gameObject.transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].gameObject.transform.position.y, currObj.transform.position.y) && Mathf.Approximately(path[i].gameObject.transform.position.z, currObj.transform.position.z))
+                    if (path[i] != null)
                     {
-                        //Creates Intersection when tow road hit from the side
-                        if (path[i].gameObject.gameObject.tag == "Road")
+                        if (Mathf.Approximately(path[i].gameObject.transform.position.x, currObj.transform.position.x) && Mathf.Approximately(path[i].gameObject.transform.position.y, currObj.transform.position.y) && Mathf.Approximately(path[i].gameObject.transform.position.z, currObj.transform.position.z))
                         {
-                            if (path[i].gameObject.transform.rotation != currObj.transform.rotation) // iF the rotation of the road tile that im hitting is not the same then add intersection
+                            //Creates Intersection when tow road hit from the side
+                            if (path[i].gameObject.gameObject.tag == "Road")
                             {
-
-                                replaceObject(path[i].gameObject, intersection, Quaternion.identity, i);
-                                return;
-
-                            }
-                        }
-                        else if (path[i].gameObject.gameObject.tag == "TJunction")                         // Creates intersection from an intersection
-                        {
-                            if (currObj.gameObject.tag == "Road")
-                            {
-                                if (path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation == Quaternion.identity ||
-                                    path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation.eulerAngles.y == 180.0f ||
-                                    path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 90.0f ||
-                                    path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 270.0f)
+                                if (path[i].gameObject.transform.rotation != currObj.transform.rotation) // iF the rotation of the road tile that im hitting is not the same then add intersection
                                 {
+
                                     replaceObject(path[i].gameObject, intersection, Quaternion.identity, i);
                                     return;
+
                                 }
                             }
-                        }
+                            else if (path[i].gameObject.gameObject.tag == "TJunction")                         // Creates intersection from an intersection
+                            {
+                                if (currObj.gameObject.tag == "Road")
+                                {
+                                    if (path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation == Quaternion.identity ||
+                                        path[i].gameObject.transform.rotation == Quaternion.identity && currObj.transform.rotation.eulerAngles.y == 180.0f ||
+                                        path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 90.0f ||
+                                        path[i].gameObject.transform.rotation.eulerAngles.y == 90.0f && currObj.transform.rotation.eulerAngles.y == 270.0f)
+                                    {
+                                        replaceObject(path[i].gameObject, intersection, Quaternion.identity, i);
+                                        return;
+                                    }
+                                }
+                            }
 
+                        }
                     }
                 }
             }
@@ -415,10 +429,6 @@ public class TiledRoadCreator : MonoBehaviour
                 }
                 else
                 {
-                    if (hit[0].gameObject.tag == "Plain")
-                    {
-                        Destroy(hit[0].gameObject);
-                    }
                     rot = q;
                     GameObject objectC = Instantiate(obj, track.transform);
                     objectC.transform.localPosition = location;
@@ -433,10 +443,6 @@ public class TiledRoadCreator : MonoBehaviour
             }
             else // if the current tile is not a road then just create it 
             {
-                if (hit[0].gameObject.tag == "Plain")
-                {
-                    Destroy(hit[0].gameObject);
-                }
                 rot = q;
                 GameObject objectC = Instantiate(obj, track.transform);
                 objectC.transform.localPosition = location;
@@ -480,7 +486,7 @@ public class TiledRoadCreator : MonoBehaviour
     {
         Vector3 newPos = new Vector3();
         newPos = Input.mousePosition;
-        newPos.z = thisCamera.farClipPlane;
+        newPos.z = thisCamera.farClipPlane - 1;
         newPos = thisCamera.ScreenToWorldPoint(newPos);
         return newPos;
     } // Gets the mouse position 
@@ -587,7 +593,7 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-    void removeClutter()
+    void removeSpawnedObjects()
     {
         if (currObj != null)
         {
@@ -597,6 +603,7 @@ public class TiledRoadCreator : MonoBehaviour
             {
                 for (int i = 0; i < hit.Length; i++)
                 {
+                    // If an intersection hits a lamp post then the lamp post is destroyed
                     if (currObj.gameObject.tag == "Intersection")
                     {
                         if (hit[i].gameObject.tag == "Lamp")
@@ -604,17 +611,6 @@ public class TiledRoadCreator : MonoBehaviour
                             Destroy(hit[i].gameObject);
 
                         }
-                    }
-
-                    if (hit[i].gameObject.tag == "Tree")
-                    {
-                        Destroy(hit[i].gameObject);
-                    }
-
-                    if (hit[i].gameObject.tag == "House")
-                    {
-                        Debug.Log("hit house");
-                        Destroy(hit[i].gameObject);
                     }
                 }
             }
@@ -710,7 +706,7 @@ public class TiledRoadCreator : MonoBehaviour
         {
             for(int z = 0; z < gridZ; z ++)
             {
-                Vector3 tempVec = new Vector3(placementPosition.x + ((gridX / 2) * GetSize(grassTile).x) - (x * GetSize(grassTile).x), 0, placementPosition.z + ((gridZ / 2) * GetSize(grassTile).z) - (z * GetSize(grassTile).z));
+                Vector3 tempVec = new Vector3(placementPosition.x + ((gridX / 2) * GetSize(grassTile).x) - (x * GetSize(grassTile).x), 1, placementPosition.z + ((gridZ / 2) * GetSize(grassTile).z) - (z * GetSize(grassTile).z));
                 GameObject temp = Instantiate(grassTile, track.transform);
                 temp.transform.localPosition = tempVec;
                 temp.transform.localRotation = Quaternion.identity;
@@ -725,33 +721,33 @@ public class TiledRoadCreator : MonoBehaviour
         {
             int num = Random.Range(0, 100);
 
-            if (num < SpawnChance)
+            if (num < BuildingSpawnChance)
             {
                 if (path[path.Count - 1].gameObject.tag == "Road")
                 {
-                    if (num < SpawnChance / 2)
+                    if (num < BuildingSpawnChance / 2)
                     {
                         if (prevDirection == "left" || prevDirection == "right")
                         {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                             return;
                         }
                         else if (prevDirection == "up" || prevDirection == "down")
                         {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                             return;
                         }
                     }
-                    if (num < SpawnChance && num > SpawnChance / 2)
+                    if (num < BuildingSpawnChance && num > BuildingSpawnChance / 2)
                     {
                         if (prevDirection == "left" || prevDirection == "right")
                         {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                             return;
                         }
                         else if (prevDirection == "up" || prevDirection == "down")
                         {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                             return;
                         }
                     }
@@ -762,15 +758,13 @@ public class TiledRoadCreator : MonoBehaviour
 
     void spawnTrees()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
             for (int i = 0; i < plains.Count; i++)
             {
                 int num = Random.Range(0, 100);
 
                 if (plains[i] != null)
                 {
-                    if (num < 5)
+                    if (num < TreeSpawnChance)
                     {
                         GameObject treeTemp = Instantiate(tree, track.transform);
                         treeTemp.transform.localPosition = plains[i].transform.localPosition;
@@ -782,7 +776,6 @@ public class TiledRoadCreator : MonoBehaviour
                     }
                 }
             }
-        }
     }
 }
 ////////

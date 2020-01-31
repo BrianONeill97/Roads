@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 9134952027422749204}
   - component: {fileID: 9134952027425616438}
   - component: {fileID: 9134952027424649462}
+  - component: {fileID: 6185233997418793634}
   m_Layer: 0
   m_Name: Ramp
   m_TagString: Ramp
@@ -25,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9134952027422715444}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -23.853592, y: 106.28143, z: -38.045265}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -79,3 +80,15 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &6185233997418793634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9134952027422715444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e65f22a35d35f4da2e5eaaaa627aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

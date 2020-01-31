@@ -21,6 +21,7 @@ public class FloodFill : MonoBehaviour
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
+            Debug.Log(hits.Length);
             floodFill(fillPoint);
 
         }

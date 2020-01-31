@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 413965082125785050}
   - component: {fileID: 413965082128652282}
   - component: {fileID: 413965082127553850}
-  - component: {fileID: 413965082118273082}
   - component: {fileID: 1211099659658599386}
+  - component: {fileID: 7410376252689643339}
+  - component: {fileID: 770199482829008432}
   m_Layer: 0
   m_Name: House
   m_TagString: House
@@ -82,25 +83,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!95 &413965082118273082
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 413965082125552634}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: e7ba6850887ae694a970af5f171fa6d5, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!65 &1211099659658599386
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -114,3 +96,31 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.1354877, y: 1.1101116, z: 1.1393386}
   m_Center: {x: -0.018082952, y: 0.5550558, z: 0.00086665154}
+--- !u!114 &7410376252689643339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413965082125552634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09c00e4295bf1a4599eeec569235618, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!54 &770199482829008432
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413965082125552634}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0

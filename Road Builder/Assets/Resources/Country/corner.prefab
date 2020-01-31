@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6803949298832145332}
   - component: {fileID: 6803949298831342486}
   - component: {fileID: 6803949298830375254}
+  - component: {fileID: 3158355220418698501}
   m_Layer: 0
   m_Name: corner
   m_TagString: Corner
@@ -78,3 +79,15 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &3158355220418698501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6803949298832631700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e65f22a35d35f4da2e5eaaaa627aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

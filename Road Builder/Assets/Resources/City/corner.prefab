@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4273894996353885833}
   - component: {fileID: 5867575150070764233}
   - component: {fileID: 3402138067257044971}
+  - component: {fileID: 5349853953100037400}
   m_Layer: 0
   m_Name: corner
   m_TagString: Corner
@@ -27,7 +28,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4273894996351694923}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -55.961887, y: 88.846466, z: 70.237114}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -110,3 +111,15 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3, y: 0.63, z: 3}
   m_Center: {x: 0.009752989, y: 0.017793998, z: 0.009752989}
+--- !u!114 &5349853953100037400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4273894996351694923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e65f22a35d35f4da2e5eaaaa627aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

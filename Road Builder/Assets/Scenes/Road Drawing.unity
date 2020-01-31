@@ -901,7 +901,7 @@ RectTransform:
   - {fileID: 817168350}
   - {fileID: 1066326414}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1000,6 +1000,7 @@ GameObject:
   - component: {fileID: 1034010784}
   - component: {fileID: 1034010787}
   - component: {fileID: 1034010788}
+  - component: {fileID: 1034010789}
   m_Layer: 0
   m_Name: Tile Test
   m_TagString: Untagged
@@ -1019,12 +1020,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3646cbdc273090458d999dd68cde22d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grassTile: {fileID: 0}
   dropDown: {fileID: 817168349}
   Canvas: {fileID: 940106606}
-  gridX: 40
-  gridZ: 40
-  SpawnChance: 50
-  Clutter: 1
+  gridX: 25
+  gridZ: 25
+  BuildingSpawnChance: 100
+  TreeSpawnChance: 29
+  LampPosts: 1
+  plains: []
+  randTile: 0
 --- !u!4 &1034010785
 Transform:
   m_ObjectHideFlags: 0
@@ -1037,7 +1042,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &1034010786
 LineRenderer:
@@ -1108,8 +1113,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0.7401557, b: 0, a: 0.37254903}
-      key1: {r: 1, g: 0.9622972, b: 0, a: 0.3882353}
+      key0: {r: 1, g: 0.009691603, b: 0, a: 1}
+      key1: {r: 1, g: 0.5408294, b: 0, a: 1}
       key2: {r: 1, g: 1, b: 1, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -1168,6 +1173,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c80b50f511573e141be77b43cdb55066, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1034010789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034010783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be725ec89c78bbb4d81961530229b30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaterTileCount: 55
+  i: 0
 --- !u!1 &1066326413
 GameObject:
   m_ObjectHideFlags: 0
@@ -1639,7 +1658,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1218154869
 GameObject:
@@ -2067,7 +2086,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1781609736
 GameObject:
@@ -2390,7 +2409,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.32
+  near clip plane: 1
   far clip plane: 150
   field of view: 47.7
   orthographic: 0
@@ -2422,7 +2441,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &2141599440
 GameObject:
