@@ -15,26 +15,39 @@ MonoBehaviour:
   m_Bool_keys:
   - pbIconGUI
   - pb_SmoothingGroupEditor::m_PreviewDither
+  - pbEnableBackfaceSelection
+  - pbDragSelectWholeElement
+  - pbVertexPaletteDockable
+  - pbGenerateUV2PerObject
   m_Int_keys:
   - pbDefaultEditLevel
   - pbDefaultSelectionMode
   - pbHandleAlignment
   - pb_GIWorkflowMode
+  - pbVertexColorTool
+  - pbDragSelectMode
+  - pbMirrorObjectScale
   m_Float_keys:
   - pbEditorScroll.x
   - pbEditorScroll.y
   - pb_SmoothingGroupEditor::m_PreviewOpacity
   m_String_keys:
   - pbCurrentMaterialPalette
+  - pbVertexColorPrefs9
+  - pbVertexColorPrefs6
+  - pbVertexColorPrefs8
   m_Color_keys: []
   m_Material_keys: []
-  m_Bool_values: 0100
-  m_Int_values: 01000000010000000000000000000000
+  m_Bool_values: 000000000000
+  m_Int_values: 0100000002000000000000000000000000000000000000000d000000
   m_Float_values:
   - 0
   - 0
   - 0.5
   m_String_values:
   - Assets/Assets Store Assets/ProCore/ProBuilder/Data/Default Material Palette.asset
+  - RGBA(0.519, 0.320, 0.066, 1.000)
+  - RGBA(0.208, 0.171, 0.171, 1.000)
+  - RGBA(0.906, 0.704, 0.431, 1.000)
   m_Color_values: []
   m_Material_values: []

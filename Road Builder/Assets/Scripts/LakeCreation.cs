@@ -27,7 +27,8 @@ public class LakeCreation : MonoBehaviour
 
     private void Start()
     {
-        temp = GetComponent<TiledRoadCreator>().plains[GetComponent<TiledRoadCreator>().randTile].gameObject.transform.localPosition;
+
+        temp = GetComponent<TiledRoadCreator>().plains[Random.Range(0, GetComponent<TiledRoadCreator>().plains.Count)].gameObject.transform.localPosition;
 
         edgeX = spacingCheckX * GetComponent<TiledRoadCreator>().gridX;
         edgeZ = spacingCheckZ * GetComponent<TiledRoadCreator>().gridZ;
@@ -95,14 +96,34 @@ public class LakeCreation : MonoBehaviour
 
         for (int i = 0; i < water.Count; i++)
         {
-            if (water[i].gameObject.transform.localPosition.x > edgeX || water[i].gameObject.transform.localPosition.x < -edgeX ||
-                water[i].gameObject.transform.localPosition.z > edgeZ || water[i].gameObject.transform.localPosition.z < -edgeZ)
+            if(water[i].gameObject != null)
             {
-                Destroy(water[i].gameObject);
-                water.RemoveAt(i);
-                Debug.Log("Removing Tile Outside bounds");
+                if (water[i].gameObject.transform.localPosition.x > edgeX || water[i].gameObject.transform.localPosition.x < -edgeX ||
+                    water[i].gameObject.transform.localPosition.z > edgeZ || water[i].gameObject.transform.localPosition.z < -edgeZ)
+                {
+                    Destroy(water[i].gameObject);
+                    water.RemoveAt(i);
+                    Debug.Log("Removing Tile Outside bounds");
+                }
             }
         }
     }
 
+    public void deleteAndReCreate()
+    {
+        temp = new Vector3();
+        prevDirection = "";
+        i = 0;
+        for (int i = 0; i < water.Count; i++)
+        {
+            Destroy(water[i].gameObject);
+            water.RemoveAt(i);
+        }
+
+        if (GetComponent<TiledRoadCreator>().plains.Count > 0)
+        {
+            temp = GetComponent<TiledRoadCreator>().plains[Random.Range(0, GetComponent<TiledRoadCreator>().plains.Count)].gameObject.transform.localPosition;
+            Create(temp, GetComponent<TiledRoadCreator>().GetSize(GetComponent<TiledRoadCreator>().grassTile));
+        }
+    }
 }

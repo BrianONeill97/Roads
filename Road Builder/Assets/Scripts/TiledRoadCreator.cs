@@ -84,8 +84,6 @@ public class TiledRoadCreator : MonoBehaviour
 
         createBlank();
         spawnTrees();
-
-        randTile = Random.Range(0, plains.Count);
     }
 
     void Update()
@@ -513,6 +511,7 @@ public class TiledRoadCreator : MonoBehaviour
     {
         for(int i = 0; i < path.Count; i++)
         {
+            Destroy(path[i].gameObject);
             path.RemoveAt(i);
         }
         Destroy(track);
@@ -526,6 +525,8 @@ public class TiledRoadCreator : MonoBehaviour
         started = false;
         track = new GameObject("Track" + trackNumber);
         createBlank();
+        spawnTrees();
+
         if (plains.Count > 0)
         {
             for (int i = 0; i < plains.Count; i++)
@@ -699,6 +700,8 @@ public class TiledRoadCreator : MonoBehaviour
             placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
         }
     }
+    //
+    
 
     public void createBlank()
     {
@@ -725,33 +728,36 @@ public class TiledRoadCreator : MonoBehaviour
             {
                 if (path[path.Count - 1].gameObject.tag == "Road")
                 {
-                    if (num < BuildingSpawnChance / 2)
+                    if (path[path.Count -1].gameObject.transform.localPosition.y < 2)
                     {
-                        if (prevDirection == "left" || prevDirection == "right")
+                        if (num < BuildingSpawnChance / 2)
                         {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                            return;
+                            if (prevDirection == "left" || prevDirection == "right")
+                            {
+                                createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                return;
+                            }
+                            else if (prevDirection == "up" || prevDirection == "down")
+                            {
+                                createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                return;
+                            }
                         }
-                        else if (prevDirection == "up" || prevDirection == "down")
+                        if (num < BuildingSpawnChance && num > BuildingSpawnChance / 2)
                         {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                            return;
+                            if (prevDirection == "left" || prevDirection == "right")
+                            {
+                                createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                return;
+                            }
+                            else if (prevDirection == "up" || prevDirection == "down")
+                            {
+                                createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                return;
+                            }
                         }
                     }
-                    if (num < BuildingSpawnChance && num > BuildingSpawnChance / 2)
-                    {
-                        if (prevDirection == "left" || prevDirection == "right")
-                        {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                            return;
-                        }
-                        else if (prevDirection == "up" || prevDirection == "down")
-                        {
-                            createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                            return;
-                        }
-                    }
-            }
+                }
             }
         }
     }
