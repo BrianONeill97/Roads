@@ -14,6 +14,7 @@ public class Builder : MonoBehaviour
     GameObject extrudedWindow;
     GameObject windowBay;
     GameObject roof;
+    GameObject Door;
 
 
     private GameObject building;
@@ -32,12 +33,13 @@ public class Builder : MonoBehaviour
     int ySize;
     int chance;
 
-    bool noDoor = true;
+    bool doorPresent = false;
+    int currentFloor = 0;
+
 
     private void Awake()
     {
-        building = new GameObject("Building");
-
+        Door = Resources.Load("BuildingParts/Country/Door") as GameObject;
         wall = Resources.Load("BuildingParts/Country/Wall") as GameObject;
         window = Resources.Load("BuildingParts/Country/WindowBay") as GameObject;
         crossWindow = Resources.Load("BuildingParts/Country/CrossWindow") as GameObject;
@@ -53,25 +55,44 @@ public class Builder : MonoBehaviour
     void Start()
     {
 
-        for(int i = 0; i < Floors; i++)
+        //for(int i = 0; i < Floors; i++)
+        //{
+        //    if (i < Floors - 1)
+        //    {
+        //        CreateFloor(new Vector3(0, i * GetSize(wall).y, 0));
+        //        CreateWalls(new Vector3(0, i * GetSize(wall).y, 0));
+        //    }
+        //    else
+        //    {
+        //    CreateRoof(new Vector3(0, (i * GetSize(wall).y) - GetSize(wall).y /2,0));
+        //    }
+        //}
+
+    }
+
+    public void create(Vector3 pos)
+    {
+        building = new GameObject("Building");
+
+        for (int i = 0; i < Floors; i++)
         {
-            //if (i < Floors - 1)
-            //{
-                CreateFloor(new Vector3(0, i * GetSize(wall).y, 0));
-                CreateWalls(new Vector3(0, i * GetSize(wall).y, 0));
-            //}
-            //else
-            //{
-            //    //CreateRoof(new Vector3(0, (i * GetSize(wall).y) - GetSize(wall).y /2,0));
-            //}
+                CreateFloor(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z));
+                CreateWalls(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z));
         }
 
+        building.AddComponent<MeshRenderer>();
+
+        building.AddComponent<BoxCollider>();
+
+        building.AddComponent<Rigidbody>();
+        building.GetComponent<Rigidbody>().useGravity = false;
+
+        building.AddComponent<ObjectCollisions>();
+
+        building.tag = "House";
     }
 
-    private void Update()
-    {
-   
-    }
+
 
     void CreateFloor(Vector3 pos)
     {
@@ -88,6 +109,7 @@ public class Builder : MonoBehaviour
                 floorTiles.Add(tile);
             }                
         }
+        currentFloor++;
     }
 
     void CreateWalls(Vector3 pos)
@@ -106,10 +128,18 @@ public class Builder : MonoBehaviour
                 }
                 else
                 {
-                    wallTypeChance = Random.Range(0, 4);
+                    wallTypeChance = Random.Range(0, 3);
                     if (wallTypeChance == 0)
                     {
-                        wallType = window;
+                        if (currentFloor == 1 && doorPresent == false)
+                        {
+                            wallType = Door;
+
+                        }
+                        else
+                        {
+                            wallType = window;
+                        }
                     }
 
                     if(wallTypeChance == 1)

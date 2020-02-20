@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class TiledRoadCreator : MonoBehaviour
 {
+    public GameObject player;
+    public Camera playerCam;
+
     GameObject straightRoad;
     GameObject cornerRoad;
     GameObject intersection;
@@ -50,7 +53,6 @@ public class TiledRoadCreator : MonoBehaviour
 
     private bool _isDraging = false; // Bool for if im dragging
     bool started = false; // turns off the start.
-    bool lakeCreated = false;
 
 
     //Variables for Placement
@@ -69,6 +71,7 @@ public class TiledRoadCreator : MonoBehaviour
 
     private void Awake()
     {
+        player.SetActive(false);
         grassTile = Resources.Load("Plain") as GameObject;
         ramp = Resources.Load("City/Ramp") as GameObject;
         roadLamp = Resources.Load("StreetLamp") as GameObject;
@@ -90,82 +93,97 @@ public class TiledRoadCreator : MonoBehaviour
     {
         thisCamera.transform.position = new Vector3(placementPosition.x, thisCamera.transform.position.y, placementPosition.z);
         //KEYBOARD PRESSES
-        //ALTER Y OF THE ROADS
-        if (Input.GetKeyUp(KeyCode.UpArrow))
-                {
-                    RampUp();
-                }
-
-        if (Input.GetKeyUp(KeyCode.DownArrow))
-                {
-                    RampDown();
-                }
-
-        //Mouse Events
-        if (!EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetKeyUp(KeyCode.Escape))
         {
-            //MOUSE PRESSES
-            //Create the roads with the mouse.
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (started == false)//After the first tile of the road has been placed
-                {
-                    Collider[] hits = Physics.OverlapSphere(_get3dMousePosition(), 0.0f); ;
+            playerCam.enabled = false;
+            thisCamera.enabled = true;
+            player.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
 
-                    if (hits.Length > 0)
+        }
+
+        if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text != "Select Road Type")
+        {
+            //ALTER Y OF THE ROADS
+            if (Input.GetKeyUp(KeyCode.UpArrow))
+            {
+                RampUp();
+            }
+
+            if (Input.GetKeyUp(KeyCode.DownArrow))
+            {
+                RampDown();
+            }
+        }
+
+        if (Camera.main == thisCamera)
+        {
+            //Mouse Events
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                //MOUSE PRESSES
+                //Create the roads with the mouse.
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (started == false)//After the first tile of the road has been placed
                     {
-                        startPoint = hits[0].gameObject.transform.position;
-                        createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
-                        placementPosition = startPoint;
-                    }
-                    started = true;
-                }
-                
-                // shows the tool when held 
-                lr.enabled = true;
-                lr.positionCount = 2;
-                lr.SetPosition(0, new Vector3(startPoint.x, startPoint.y + 2, startPoint.z));
+                        Collider[] hits = Physics.OverlapSphere(_get3dMousePosition(), 0.0f); ;
 
-                _isDraging = true;
-            }
-            //Changes the line rotation.
-            if (_isDraging)
-            {
-                //Gets the position of the mouse
-                Vector3 dir = _get3dMousePosition() - startPoint;
-                selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-                lr.SetPosition(1, new Vector3(_get3dMousePosition().x, _get3dMousePosition().y + 2, _get3dMousePosition().z));
-            }
-            //Gets the angle of the line and then selects the road from that.
-            if (Input.GetMouseButtonUp(0))
-            {
-                if (selectorAngle >= 65 && selectorAngle <= 115)
-                {
-                    ChooseDirectionRoads(straightRoad, "right");
-                    prevDirection = "right";
+                        if (hits.Length > 0)
+                        {
+                            startPoint = hits[0].gameObject.transform.position;
+                            createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
+                            placementPosition = startPoint;
+                        }
+                        started = true;
+                    }
+
+                    // shows the tool when held 
+                    lr.enabled = true;
+                    lr.positionCount = 2;
+                    lr.SetPosition(0, new Vector3(startPoint.x, startPoint.y + 2, startPoint.z));
+
+                    _isDraging = true;
                 }
-                if (selectorAngle > -115 && selectorAngle < -65)
+                //Changes the line rotation.
+                if (_isDraging)
                 {
-                    ChooseDirectionRoads(straightRoad, "left");
-                    prevDirection = "left";
+                    //Gets the position of the mouse
+                    Vector3 dir = _get3dMousePosition() - startPoint;
+                    selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+                    lr.SetPosition(1, new Vector3(_get3dMousePosition().x, _get3dMousePosition().y + 2, _get3dMousePosition().z));
                 }
-                if (selectorAngle > 155 && selectorAngle > -155)
+                //Gets the angle of the line and then selects the road from that.
+                if (Input.GetMouseButtonUp(0))
                 {
-                    ChooseDirectionRoads(straightRoad, "down");
-                    prevDirection = "down";
-                }
-                if (selectorAngle < 25 && selectorAngle > -25)
-                {
-                    ChooseDirectionRoads(straightRoad, "up");
-                    prevDirection = "up";
-                }
-                if (LampPosts == true)
-                {
+                    if (selectorAngle >= 65 && selectorAngle <= 115)
+                    {
+                        ChooseDirectionRoads(straightRoad, "right");
+                        prevDirection = "right";
+                    }
+                    if (selectorAngle > -115 && selectorAngle < -65)
+                    {
+                        ChooseDirectionRoads(straightRoad, "left");
+                        prevDirection = "left";
+                    }
+                    if (selectorAngle > 155 && selectorAngle > -155)
+                    {
+                        ChooseDirectionRoads(straightRoad, "down");
+                        prevDirection = "down";
+                    }
+                    if (selectorAngle < 25 && selectorAngle > -25)
+                    {
+                        ChooseDirectionRoads(straightRoad, "up");
+                        prevDirection = "up";
+                    }
+                    if (LampPosts == true)
+                    {
                         createClutter();
                         spawnBuilding();
+                    }
+                    _isDraging = false;
+                    lr.enabled = false;
                 }
-                _isDraging = false;
-                lr.enabled = false;
             }
         }
 
@@ -569,6 +587,8 @@ public class TiledRoadCreator : MonoBehaviour
 
     void createClutter()
     {
+        float offsetYForLamp = 0.2f;
+
         if(path.Count > 0)
         {
             if((path.Count % 2) != 0)
@@ -577,12 +597,12 @@ public class TiledRoadCreator : MonoBehaviour
                 {
                     if (prevDirection == "left" || prevDirection == "right")
                     {
-                        createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z / 3.5f), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                        createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + offsetYForLamp, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z / 3.5f), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                         return;
                     }
                     else if (prevDirection == "up" || prevDirection == "down")
                     {
-                        createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).z / 3.5f, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                        createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x / 3.5f, path[path.Count - 1].transform.position.y + offsetYForLamp, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                         return;
                     }
                 }
@@ -620,6 +640,15 @@ public class TiledRoadCreator : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public void switchCamera()
+    {
+        thisCamera.enabled = false;
+        player.SetActive(true);
+        playerCam.enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+
     }
 
     //Testing functions (NOT PERMANANT)
@@ -734,12 +763,13 @@ public class TiledRoadCreator : MonoBehaviour
                         {
                             if (prevDirection == "left" || prevDirection == "right")
                             {
-                                createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                gameObject.GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z));
+                                //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                                createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                //createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                         }
@@ -747,12 +777,14 @@ public class TiledRoadCreator : MonoBehaviour
                         {
                             if (prevDirection == "left" || prevDirection == "right")
                             {
-                                createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                                createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                gameObject.GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z));
+
+                                //createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                         }

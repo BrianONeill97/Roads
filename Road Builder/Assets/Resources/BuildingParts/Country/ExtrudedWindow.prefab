@@ -16,8 +16,8 @@ GameObject:
   - component: {fileID: 8478854364869582285}
   - component: {fileID: 8478854364869582286}
   m_Layer: 0
-  m_Name: WindowTwo
-  m_TagString: Door
+  m_Name: ExtrudedWindow
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 1
