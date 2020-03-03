@@ -28,10 +28,10 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
-  - 
-  - 
-  - 
+  - BuildingLayer
+  - BuildingPieces
+  - Enviroment
+  - Player
   - 
   - 
   - 

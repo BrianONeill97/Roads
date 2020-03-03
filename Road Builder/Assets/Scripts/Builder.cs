@@ -17,7 +17,6 @@ public class Builder : MonoBehaviour
     GameObject Door;
 
 
-    private GameObject building;
 
     public int Floors;
 
@@ -26,12 +25,11 @@ public class Builder : MonoBehaviour
     public int minFloorSize;
 
     [Header("Window Properties: ")]
-    public int minWindowsPerLevel;
-    public int maxWindowsPerLevel;
+    public int maxWindows;
 
     int xSize;
     int ySize;
-    int chance;
+    int windowCount = 0;
 
     bool doorPresent = false;
     int currentFloor = 0;
@@ -54,47 +52,49 @@ public class Builder : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
-        //for(int i = 0; i < Floors; i++)
-        //{
-        //    if (i < Floors - 1)
-        //    {
-        //        CreateFloor(new Vector3(0, i * GetSize(wall).y, 0));
-        //        CreateWalls(new Vector3(0, i * GetSize(wall).y, 0));
-        //    }
-        //    else
-        //    {
-        //    CreateRoof(new Vector3(0, (i * GetSize(wall).y) - GetSize(wall).y /2,0));
-        //    }
-        //}
-
+       create(new Vector3(0, 0, 0));
     }
 
     public void create(Vector3 pos)
     {
-        building = new GameObject("Building");
+        GameObject building = new GameObject("Building");
 
         for (int i = 0; i < Floors; i++)
         {
-                CreateFloor(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z));
-                CreateWalls(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z));
+                CreateFloor(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z),building);
+                CreateWalls(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z),building);
+
+            if(i == 0 && doorPresent == false)
+            {
+                int chanceDoorTile = Random.Range(0, wallTiles.Count);
+                GameObject doorObj = Instantiate(Door, building.transform);
+                doorObj.transform.localPosition = wallTiles[chanceDoorTile].transform.position;
+                doorObj.transform.localRotation = wallTiles[chanceDoorTile].transform.rotation;
+                Destroy(wallTiles[chanceDoorTile]);
+                wallTiles.RemoveAt(chanceDoorTile);
+                wallTiles.Insert(chanceDoorTile,doorObj);
+                doorPresent = true;
+            }
         }
 
         building.AddComponent<MeshRenderer>();
 
+        // Box Collider 
         building.AddComponent<BoxCollider>();
+        building.GetComponent<BoxCollider>().center = new Vector3((xSize/2) * GetSize(floor).x, (Floors * GetSize(wall).y) /2, (ySize / 2) * GetSize(floor).z);
+        building.GetComponent<BoxCollider>().size = new Vector3(xSize * GetSize(floor).x, Floors * GetSize(wall).y, ySize * GetSize(floor).z);
 
+        // Rigidbody 
         building.AddComponent<Rigidbody>();
         building.GetComponent<Rigidbody>().useGravity = false;
-
-        building.AddComponent<ObjectCollisions>();
+        building.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
         building.tag = "House";
     }
 
 
 
-    void CreateFloor(Vector3 pos)
+    void CreateFloor(Vector3 pos,GameObject building)
     {
         xSize = Random.Range(minFloorSize, maxFloorSize);
         ySize = Random.Range(minFloorSize, maxFloorSize);
@@ -112,62 +112,22 @@ public class Builder : MonoBehaviour
         currentFloor++;
     }
 
-    void CreateWalls(Vector3 pos)
+    void CreateWalls(Vector3 pos, GameObject building)
     {
-        int chance;
-        int wallTypeChance;
-        GameObject wallType = wall;
         for (int i = 0; i < xSize; i++)
         {
             for (int z = 0; z < ySize; z++)
             {
-                chance = Random.Range(0, 3);
-                if (chance != 0)
-                {
-                    wallType = wall;
-                }
-                else
-                {
-                    wallTypeChance = Random.Range(0, 3);
-                    if (wallTypeChance == 0)
-                    {
-                        if (currentFloor == 1 && doorPresent == false)
-                        {
-                            wallType = Door;
-
-                        }
-                        else
-                        {
-                            wallType = window;
-                        }
-                    }
-
-                    if(wallTypeChance == 1)
-                    {
-                        wallType = crossWindow;
-                    }
-
-                    if (wallTypeChance == 2)
-                    {
-                        wallType = extrudedWindow;
-                    }
-
-                    if (wallTypeChance == 3)
-                    {
-                        wallType = windowBay;
-                    }
-                }
-
                 if (i == 0)
                 {
-                    GameObject wall = Instantiate(wallType, building.transform);
+                    GameObject wall = Instantiate(WallTypeSelector(), building.transform);
                     wall.transform.localPosition = new Vector3(pos.x + (i * GetSize(floor).x) - GetSize(floor).x / 2, pos.y + GetSize(wall).y / 2, pos.z + (z * GetSize(floor).z));
                     wall.transform.localRotation = Quaternion.identity;
                     wallTiles.Add(wall);
                 }
                 else if (i == xSize - 1)
                 {
-                    GameObject wall = Instantiate(wallType, building.transform);
+                    GameObject wall = Instantiate(WallTypeSelector(), building.transform);
                     wall.transform.localPosition = new Vector3(pos.x + ((i * GetSize(floor).x) + GetSize(floor).x / 2), pos.y + GetSize(wall).y / 2, pos.z + (z * GetSize(floor).z));
                     wall.transform.localRotation = Quaternion.Euler(0, 180, 0);
                     wallTiles.Add(wall);
@@ -175,14 +135,14 @@ public class Builder : MonoBehaviour
 
                 if (z == 0)
                 {
-                    GameObject wall = Instantiate(wallType, building.transform);
+                    GameObject wall = Instantiate(WallTypeSelector(), building.transform);
                     wall.transform.localPosition = new Vector3(pos.x + (i * GetSize(floor).x), pos.y + GetSize(wall).y / 2, pos.z + ((z * GetSize(floor).z) - GetSize(floor).z / 2));
                     wall.transform.localRotation = Quaternion.Euler(0, 270, 0);
                     wallTiles.Add(wall);
                 }
                 else if (z == ySize - 1)
                 {
-                    GameObject wall = Instantiate(wallType, building.transform);
+                    GameObject wall = Instantiate(WallTypeSelector(), building.transform);
                     wall.transform.localPosition = new Vector3(pos.x + (i * GetSize(floor).x), pos.y + GetSize(wall).y / 2, pos.z + ((z * GetSize(floor).z) + GetSize(floor).z / 2));
                     wall.transform.localRotation = Quaternion.Euler(0, 90, 0);
                     wallTiles.Add(wall);
@@ -221,10 +181,6 @@ public class Builder : MonoBehaviour
         }
     }
 
-
-
-
-
     public Vector3 GetSize(GameObject obj)
     {
         Vector3 dimensions;
@@ -234,4 +190,50 @@ public class Builder : MonoBehaviour
         dimensions = new Vector3(width, height, depth);
         return dimensions;
     } // Gets the ACTUAL size of the tile
+
+    GameObject WallTypeSelector()
+    {
+        //Wall Type being used ( Changes based on a chance between two two values )
+        GameObject wallType = wall;
+
+        //Chance when it is going to be window to be different types
+        int wallTypeChance;
+        int chance = Random.Range(0, 100);
+        if (windowCount < maxWindows)
+        {
+            if (chance < 75)
+            {
+                wallType = wall;
+            }
+            else
+            {
+                wallTypeChance = Random.Range(0, 4);
+                switch(wallTypeChance)
+                {
+                    case 1:
+                        wallType = window;
+                        windowCount++;
+                        break;
+                    case 2:
+                        wallType = crossWindow;
+                        windowCount++;
+                        break;
+                    case 3:
+                        wallType = crossWindow;
+                        windowCount++;
+                        break;
+                    case 4:
+                        wallType = extrudedWindow;
+                        windowCount++;
+                        break;
+                }
+            }
+        }
+        else
+        {
+            wallType = wall;
+        }
+
+        return wallType;
+    }
 }

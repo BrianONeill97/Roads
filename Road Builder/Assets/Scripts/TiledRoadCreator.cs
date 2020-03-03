@@ -763,12 +763,14 @@ public class TiledRoadCreator : MonoBehaviour
                         {
                             if (prevDirection == "left" || prevDirection == "right")
                             {
-                                gameObject.GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z));
+                                //Left to right under the road
+                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z));
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
+                               // GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z));
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
@@ -777,12 +779,14 @@ public class TiledRoadCreator : MonoBehaviour
                         {
                             if (prevDirection == "left" || prevDirection == "right")
                             {
+                                //GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z));
+
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                                gameObject.GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z));
+                                //GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z));
 
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
@@ -805,7 +809,7 @@ public class TiledRoadCreator : MonoBehaviour
                     if (num < TreeSpawnChance)
                     {
                         GameObject treeTemp = Instantiate(tree, track.transform);
-                        treeTemp.transform.localPosition = plains[i].transform.localPosition;
+                        treeTemp.transform.localPosition = plains[i].transform.localPosition + new Vector3(0,0.3f,0);
                         treeTemp.transform.localRotation = Quaternion.identity;
                     }
                     else

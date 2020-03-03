@@ -237,11 +237,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904884579e39837448de942e67d1352c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Floors: 3
+  Floors: 2
   maxFloorSize: 3
   minFloorSize: 3
-  minWindowsPerLevel: 1
-  maxWindowsPerLevel: 4
+  maxWindows: 10
 --- !u!1 &1494159253
 GameObject:
   m_ObjectHideFlags: 0
