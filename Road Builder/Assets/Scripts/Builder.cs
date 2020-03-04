@@ -52,13 +52,17 @@ public class Builder : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       create(new Vector3(0, 0, 0));
+       //create(new Vector3(0, 0, 0));
     }
 
     public void create(Vector3 pos)
     {
+        floorTiles.Clear();
+        wallTiles.Clear();
+        doorPresent = false;
+        currentFloor = 0;
+        windowCount = 0;
         GameObject building = new GameObject("Building");
-
         for (int i = 0; i < Floors; i++)
         {
                 CreateFloor(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z),building);
@@ -70,7 +74,7 @@ public class Builder : MonoBehaviour
                 GameObject doorObj = Instantiate(Door, building.transform);
                 doorObj.transform.localPosition = wallTiles[chanceDoorTile].transform.position;
                 doorObj.transform.localRotation = wallTiles[chanceDoorTile].transform.rotation;
-                Destroy(wallTiles[chanceDoorTile]);
+                Destroy(wallTiles[chanceDoorTile].gameObject);
                 wallTiles.RemoveAt(chanceDoorTile);
                 wallTiles.Insert(chanceDoorTile,doorObj);
                 doorPresent = true;
@@ -81,15 +85,21 @@ public class Builder : MonoBehaviour
 
         // Box Collider 
         building.AddComponent<BoxCollider>();
-        building.GetComponent<BoxCollider>().center = new Vector3((xSize/2) * GetSize(floor).x, (Floors * GetSize(wall).y) /2, (ySize / 2) * GetSize(floor).z);
+        building.GetComponent<BoxCollider>().center = new Vector3(((xSize/2) * GetSize(floor).x) + pos.x, (Floors * (GetSize(wall).y) /2) + pos.y, ((ySize / 2) * GetSize(floor).z) + pos.z);
         building.GetComponent<BoxCollider>().size = new Vector3(xSize * GetSize(floor).x, Floors * GetSize(wall).y, ySize * GetSize(floor).z);
+        building.layer = LayerMask.NameToLayer("BuildingLayer");
 
         // Rigidbody 
         building.AddComponent<Rigidbody>();
         building.GetComponent<Rigidbody>().useGravity = false;
+        building.GetComponent<Rigidbody>().isKinematic = false;
         building.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
+
         building.tag = "House";
+
+        building.AddComponent<ObjectCollisions>();
+
     }
 
 

@@ -71,6 +71,8 @@ public class ObjectCollisions : MonoBehaviour
             }
         }
 
+
+
         if (other.gameObject.CompareTag("TJunction"))
         {
             Destroy(gameObject);

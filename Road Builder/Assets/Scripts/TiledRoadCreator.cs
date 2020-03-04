@@ -764,13 +764,13 @@ public class TiledRoadCreator : MonoBehaviour
                             if (prevDirection == "left" || prevDirection == "right")
                             {
                                 //Left to right under the road
-                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z));
+                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z -1.0f));
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                               // GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z));
+                               GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x + 0.25f, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z)) ;
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
@@ -779,14 +779,14 @@ public class TiledRoadCreator : MonoBehaviour
                         {
                             if (prevDirection == "left" || prevDirection == "right")
                             {
-                                //GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z));
+                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z + 5.5f));
 
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                                //GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y, path[path.Count - 1].transform.position.z));
+                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x - 7.0f, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z));
 
                                 //createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
                                 return;

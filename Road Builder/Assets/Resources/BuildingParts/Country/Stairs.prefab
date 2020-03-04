@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 404875894548720701}
   - component: {fileID: 404875894548720700}
   - component: {fileID: 1459314331897237596}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Stairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,10 +93,10 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 126
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &404875894548720701
 MonoBehaviour:
   m_ObjectHideFlags: 0
