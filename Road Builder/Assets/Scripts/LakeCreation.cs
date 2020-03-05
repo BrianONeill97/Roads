@@ -123,6 +123,9 @@ public class LakeCreation : MonoBehaviour
         if (GetComponent<TiledRoadCreator>().plains.Count > 0)
         {
             temp = GetComponent<TiledRoadCreator>().plains[Random.Range(0, GetComponent<TiledRoadCreator>().plains.Count)].gameObject.transform.localPosition;
+
+            edgeX = spacingCheckX * GetComponent<TiledRoadCreator>().gridX;
+            edgeZ = spacingCheckZ * GetComponent<TiledRoadCreator>().gridZ;
             Create(temp, GetComponent<TiledRoadCreator>().GetSize(GetComponent<TiledRoadCreator>().grassTile));
         }
     }
