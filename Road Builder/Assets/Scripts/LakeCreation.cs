@@ -111,22 +111,22 @@ public class LakeCreation : MonoBehaviour
 
     public void deleteAndReCreate()
     {
-        temp = new Vector3();
-        prevDirection = "";
-        i = 0;
-        for (int i = 0; i < water.Count; i++)
-        {
-            Destroy(water[i].gameObject);
-            water.RemoveAt(i);
-        }
+        //temp = new Vector3();
+        //prevDirection = "";
+        //i = 0;
+        //for (int i = 0; i < water.Count; i++)
+        //{
+        //    Destroy(water[i].gameObject);
+        //    water.RemoveAt(i);
+        //}
 
-        if (GetComponent<TiledRoadCreator>().plains.Count > 0)
-        {
-            temp = GetComponent<TiledRoadCreator>().plains[Random.Range(0, GetComponent<TiledRoadCreator>().plains.Count)].gameObject.transform.localPosition;
+        //if (GetComponent<TiledRoadCreator>().plains.Count > 0)
+        //{
+        //    temp = GetComponent<TiledRoadCreator>().plains[Random.Range(0, GetComponent<TiledRoadCreator>().plains.Count)].gameObject.transform.localPosition;
 
-            edgeX = spacingCheckX * GetComponent<TiledRoadCreator>().gridX;
-            edgeZ = spacingCheckZ * GetComponent<TiledRoadCreator>().gridZ;
-            Create(temp, GetComponent<TiledRoadCreator>().GetSize(GetComponent<TiledRoadCreator>().grassTile));
-        }
+        //    edgeX = spacingCheckX * GetComponent<TiledRoadCreator>().gridX;
+        //    edgeZ = spacingCheckZ * GetComponent<TiledRoadCreator>().gridZ;
+        //    Create(temp, GetComponent<TiledRoadCreator>().GetSize(GetComponent<TiledRoadCreator>().grassTile));
+        //}
     }
 }

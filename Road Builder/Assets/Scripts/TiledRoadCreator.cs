@@ -16,8 +16,8 @@ public class TiledRoadCreator : MonoBehaviour
     public GameObject grassTile; 
     GameObject ramp;
     GameObject roadLamp;
-    GameObject bench;
-    GameObject bin;
+    GameObject Grass;
+    GameObject Rock;
     GameObject tree;
     GameObject house;
 
@@ -75,18 +75,19 @@ public class TiledRoadCreator : MonoBehaviour
         grassTile = Resources.Load("Plain") as GameObject;
         ramp = Resources.Load("City/Ramp") as GameObject;
         roadLamp = Resources.Load("StreetLamp") as GameObject;
-        bench = Resources.Load("bench") as GameObject;
+        Grass = Resources.Load("Grass") as GameObject;
         tree = Resources.Load("tree") as GameObject;
 
 
-        bin = Resources.Load("bin") as GameObject;
+        Rock = Resources.Load("Rocks") as GameObject;
         thisCamera = Camera.main;
         lr = gameObject.GetComponent<LineRenderer>();
         track = new GameObject("Track" + trackNumber);
         track.gameObject.tag = "Track";
 
         createBlank();
-        spawnTrees();
+       // spawnTrees();
+        scatter(plains[0].transform.position);
     }
 
     void Update()
@@ -121,68 +122,73 @@ public class TiledRoadCreator : MonoBehaviour
             //Mouse Events
             if (!EventSystem.current.IsPointerOverGameObject())
             {
-                //MOUSE PRESSES
-                //Create the roads with the mouse.
-                if (Input.GetMouseButtonDown(0))
+                if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text != "Select Road Type")
                 {
-                    if (started == false)//After the first tile of the road has been placed
+                    //MOUSE PRESSES
+                    //Create the roads with the mouse.
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        Collider[] hits = Physics.OverlapSphere(_get3dMousePosition(), 0.0f); ;
-
-                        if (hits.Length > 0)
+                        if (started == false)//After the first tile of the road has been placed
                         {
-                            startPoint = hits[0].gameObject.transform.position;
-                            createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
-                            placementPosition = startPoint;
+                            Collider[] hits = Physics.OverlapSphere(_get3dMousePosition(), 0.0f); ;
+
+                            if (hits.Length > 0)
+                            {
+                                startPoint = hits[0].gameObject.transform.position;
+                                createTile(startPoint, straightRoad, Quaternion.identity, straightRoad.gameObject.tag);
+                                placementPosition = startPoint;
+                            }
+                            started = true;
                         }
-                        started = true;
-                    }
 
-                    // shows the tool when held 
-                    lr.enabled = true;
-                    lr.positionCount = 2;
-                    lr.SetPosition(0, new Vector3(startPoint.x, startPoint.y + 2, startPoint.z));
+                        // shows the tool when held 
+                        lr.enabled = true;
+                        lr.positionCount = 2;
+                        lr.SetPosition(0, new Vector3(startPoint.x, startPoint.y + 2, startPoint.z));
 
-                    _isDraging = true;
-                }
-                //Changes the line rotation.
-                if (_isDraging)
-                {
-                    //Gets the position of the mouse
-                    Vector3 dir = _get3dMousePosition() - startPoint;
-                    selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-                    lr.SetPosition(1, new Vector3(_get3dMousePosition().x, _get3dMousePosition().y + 2, _get3dMousePosition().z));
-                }
-                //Gets the angle of the line and then selects the road from that.
-                if (Input.GetMouseButtonUp(0))
-                {
-                    if (selectorAngle >= 65 && selectorAngle <= 115)
-                    {
-                        ChooseDirectionRoads(straightRoad, "right");
-                        prevDirection = "right";
+                        _isDraging = true;
                     }
-                    if (selectorAngle > -115 && selectorAngle < -65)
+                    //Changes the line rotation.
+                    if (_isDraging)
                     {
-                        ChooseDirectionRoads(straightRoad, "left");
-                        prevDirection = "left";
+                        //Gets the position of the mouse
+                        Vector3 dir = _get3dMousePosition() - startPoint;
+                        selectorAngle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+                        lr.SetPosition(1, new Vector3(_get3dMousePosition().x, _get3dMousePosition().y + 2, _get3dMousePosition().z));
                     }
-                    if (selectorAngle > 155 && selectorAngle > -155)
+                    //Gets the angle of the line and then selects the road from that.
+                    if (Input.GetMouseButtonUp(0))
                     {
-                        ChooseDirectionRoads(straightRoad, "down");
-                        prevDirection = "down";
-                    }
-                    if (selectorAngle < 25 && selectorAngle > -25)
-                    {
-                        ChooseDirectionRoads(straightRoad, "up");
-                        prevDirection = "up";
-                    }
-                    if (LampPosts == true)
-                    {
-                        createClutter();
+                        if (selectorAngle >= 65 && selectorAngle <= 115)
+                        {
+                            ChooseDirectionRoads(straightRoad, "right");
+                            prevDirection = "right";
+                        }
+                        if (selectorAngle > -115 && selectorAngle < -65)
+                        {
+                            ChooseDirectionRoads(straightRoad, "left");
+                            prevDirection = "left";
+                        }
+                        if (selectorAngle > 155 && selectorAngle > -155)
+                        {
+                            ChooseDirectionRoads(straightRoad, "down");
+                            prevDirection = "down";
+                        }
+                        if (selectorAngle < 25 && selectorAngle > -25)
+                        {
+                            ChooseDirectionRoads(straightRoad, "up");
+                            prevDirection = "up";
+                        }
+                        if (LampPosts == true)
+                        {
+                            createClutter();
+                        }
                         spawnBuilding();
+
+                        _isDraging = false;
+                        lr.enabled = false;
+
                     }
-                    _isDraging = false;
-                    lr.enabled = false;
                 }
             }
         }
@@ -191,7 +197,7 @@ public class TiledRoadCreator : MonoBehaviour
         createIntersection();
         tJunction();
         removeSpawnedObjects();
-
+        Debug.Log(plains.Count);
     }
 
     //Create the roads
@@ -542,8 +548,12 @@ public class TiledRoadCreator : MonoBehaviour
         Destroy(currObj);
         started = false;
         track = new GameObject("Track" + trackNumber);
+        plains.Clear();
         createBlank();
-        spawnTrees();
+        if (plains[0] != null)
+        {
+            scatter(plains[0].transform.position);
+        }
 
         if (plains.Count > 0)
         {
@@ -729,7 +739,6 @@ public class TiledRoadCreator : MonoBehaviour
             placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
         }
     }
-    //
     
 
     public void createBlank()
@@ -764,31 +773,41 @@ public class TiledRoadCreator : MonoBehaviour
                             if (prevDirection == "left" || prevDirection == "right")
                             {
                                 //Left to right under the road
-                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z -1.0f));
-                                //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                GetComponent<Builder>().create(new Vector3(
+                                                                            path[path.Count - 1].transform.position.x,
+                                                                            path[path.Count - 1].transform.position.y - 0.35f,
+                                                                            path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z),
+                                                                            Quaternion.Euler(0, 90, 0));
                                 return;
                             }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                               GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x + 0.25f, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z)) ;
-                                //createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                GetComponent<Builder>().create(new Vector3(
+                                                                             path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x,
+                                                                             path[path.Count - 1].transform.position.y - 0.35f,
+                                                                             path[path.Count - 1].transform.position.z),
+                                                                             Quaternion.Euler(0, 180, 0));
                                 return;
                             }
                         }
                         if (num < BuildingSpawnChance && num > BuildingSpawnChance / 2)
                         {
-                            if (prevDirection == "left" || prevDirection == "right")
-                            {
-                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z + 5.5f));
-
-                                //createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                                return;
-                            }
+                                if (prevDirection == "left" || prevDirection == "right")
+                                {
+                                    GetComponent<Builder>().create(new Vector3(
+                                                                                path[path.Count - 1].transform.position.x,
+                                                                                path[path.Count - 1].transform.position.y - 0.35f,
+                                                                                path[path.Count - 1].transform.position.z + GetSize(path[path.Count - 1].gameObject).z), 
+                                                                                Quaternion.Euler(0, 270, 0));
+                                    return;
+                                }
                             else if (prevDirection == "up" || prevDirection == "down")
                             {
-                                GetComponent<Builder>().create(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x - 7.0f, path[path.Count - 1].transform.position.y + 0.3f, path[path.Count - 1].transform.position.z));
-
-                                //createTile(new Vector3(path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).z, path[path.Count - 1].transform.position.y + GetSize(house).y / 10, path[path.Count - 1].transform.position.z), house, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                                GetComponent<Builder>().create(new Vector3(
+                                                                            path[path.Count - 1].transform.position.x + GetSize(path[path.Count - 1].gameObject).x,
+                                                                            path[path.Count - 1].transform.position.y - 0.35f,
+                                                                            path[path.Count - 1].transform.position.z),
+                                                                            Quaternion.Euler(0, 0, 0));
                                 return;
                             }
                         }
@@ -798,27 +817,76 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-    void spawnTrees()
-    {
-            for (int i = 0; i < plains.Count; i++)
-            {
-                int num = Random.Range(0, 100);
 
-                if (plains[i] != null)
-                {
-                    if (num < TreeSpawnChance)
-                    {
-                        GameObject treeTemp = Instantiate(tree, track.transform);
-                        treeTemp.transform.localPosition = plains[i].transform.localPosition + new Vector3(0,0.3f,0);
-                        treeTemp.transform.localRotation = Quaternion.identity;
-                    }
-                    else
-                    {
-                        plains.RemoveAt(i);
-                    }
-                }
-            }
+    void spawnTrees(Vector3 startPlainPos,float x, float y, int i, int k)
+    {
+        float p = 0.4f;
+
+        int num = Random.Range(0, 100);
+        if (num < TreeSpawnChance)
+        {
+            GameObject treeTemp = Instantiate(tree, track.transform);
+            treeTemp.transform.localPosition = new Vector3(startPlainPos.x - x * i - Random.RandomRange(-p, p) * x,
+                                                            1.3f,
+                                                            startPlainPos.z - y * k - Random.RandomRange(-p, p) * y);
+            treeTemp.transform.localRotation = Quaternion.identity;
+        }
     }
+
+    void spawnRocks(Vector3 startPlainPos, float x, float y, int i, int k)
+    {
+        float p = 0.4f;
+
+        int num = Random.Range(0, 100);
+        if (num < TreeSpawnChance)
+        {
+            GameObject treeTemp = Instantiate(Rock, track.transform);
+            treeTemp.transform.localPosition = new Vector3(startPlainPos.x - x * i - Random.RandomRange(-p, p) * x,
+                                                            1.3f,
+                                                            startPlainPos.z - y * k - Random.RandomRange(-p, p) * y);
+            treeTemp.transform.localRotation = Quaternion.identity;
+        }
+    }
+
+    void spawnGrass(Vector3 startPlainPos, float x, float y, int i, int k)
+    {
+        float p = 0.4f;
+
+        int num = Random.Range(0, 100);
+        if (num < TreeSpawnChance)
+        {
+            GameObject treeTemp = Instantiate(Grass, track.transform);
+            treeTemp.transform.localPosition = new Vector3(startPlainPos.x - x * i - Random.RandomRange(-p, p) * x,
+                                                            1.3f,
+                                                            startPlainPos.z - y * k - Random.RandomRange(-p, p) * y);
+            treeTemp.transform.localRotation = Quaternion.identity;
+        }
+    }
+
+
+    void scatter(Vector3 startPlainPos)
+    {
+        float w = gridX * GetSize(grassTile).x;
+        float h = gridZ * GetSize(grassTile).z;
+
+        float x = w / gridX;
+        float y = h / gridZ;
+
+        for(int i = 0; i < (gridX); i++)
+        {
+            for (int k = 0; k < (gridZ); k++)
+            {
+                spawnTrees(startPlainPos, x, y, i, k);
+                spawnRocks(startPlainPos, x, y, i, k);
+                spawnGrass(startPlainPos, x, y, i, k);
+                spawnGrass(startPlainPos, x, y, i, k);
+            }
+        }
+
+
+    }
+
+
 }
 ////////
 //TODO:
