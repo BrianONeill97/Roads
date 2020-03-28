@@ -2,11 +2,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class TiledRoadCreator : MonoBehaviour
 {
+    Camera thisCamera;
     public GameObject player;
-    public Camera playerCam;
 
     GameObject straightRoad;
     GameObject cornerRoad;
@@ -32,11 +33,8 @@ public class TiledRoadCreator : MonoBehaviour
     [Header("Spawning")]
     [Range(0.0f,100.0f)]
     public int BuildingSpawnChance = 33;
-    [Range(0.0f, 100.0f)]
-    public int TreeSpawnChance = 10;
 
-
-    public bool LampPosts = false;
+    bool m_allowLamps = false;
 
     //Track to be saved
     private GameObject track;
@@ -49,7 +47,6 @@ public class TiledRoadCreator : MonoBehaviour
     public List<GameObject> plains = new List<GameObject>();
 
     LineRenderer lr; // line renderer
-    Camera thisCamera;
 
     private bool _isDraging = false; // Bool for if im dragging
     bool started = false; // turns off the start.
@@ -71,7 +68,7 @@ public class TiledRoadCreator : MonoBehaviour
 
     private void Awake()
     {
-        player.SetActive(false);
+        thisCamera = Camera.main;
         grassTile = Resources.Load("Plain") as GameObject;
         ramp = Resources.Load("City/Ramp") as GameObject;
         roadLamp = Resources.Load("StreetLamp") as GameObject;
@@ -79,29 +76,17 @@ public class TiledRoadCreator : MonoBehaviour
         tree = Resources.Load("tree") as GameObject;
 
 
-        Rock = Resources.Load("Rocks") as GameObject;
-        thisCamera = Camera.main;
+        Rock = Resources.Load("Rock") as GameObject;
         lr = gameObject.GetComponent<LineRenderer>();
         track = new GameObject("Track" + trackNumber);
         track.gameObject.tag = "Track";
 
         createBlank();
-       // spawnTrees();
-        scatter(plains[0].transform.position);
     }
 
     void Update()
     {
         thisCamera.transform.position = new Vector3(placementPosition.x, thisCamera.transform.position.y, placementPosition.z);
-        //KEYBOARD PRESSES
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            playerCam.enabled = false;
-            thisCamera.enabled = true;
-            player.SetActive(false);
-            Cursor.lockState = CursorLockMode.None;
-
-        }
 
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text != "Select Road Type")
         {
@@ -179,11 +164,8 @@ public class TiledRoadCreator : MonoBehaviour
                             ChooseDirectionRoads(straightRoad, "up");
                             prevDirection = "up";
                         }
-                        if (LampPosts == true)
-                        {
-                            createClutter();
-                        }
                         spawnBuilding();
+                        createLamps();
 
                         _isDraging = false;
                         lr.enabled = false;
@@ -196,8 +178,6 @@ public class TiledRoadCreator : MonoBehaviour
         changeTileType();
         createIntersection();
         tJunction();
-        removeSpawnedObjects();
-        Debug.Log(plains.Count);
     }
 
     //Create the roads
@@ -531,43 +511,6 @@ public class TiledRoadCreator : MonoBehaviour
         path.Insert(placeInList, currObj);
     } // REplace the game object in the list with a new one
 
-    void emptyPath()
-    {
-        for(int i = 0; i < path.Count; i++)
-        {
-            Destroy(path[i].gameObject);
-            path.RemoveAt(i);
-        }
-        Destroy(track);
-        trackNumber++;
-    } // Empty the path for the new track
-
-    public void createNewPath()
-    {
-        emptyPath();
-        Destroy(currObj);
-        started = false;
-        track = new GameObject("Track" + trackNumber);
-        plains.Clear();
-        createBlank();
-        if (plains[0] != null)
-        {
-            scatter(plains[0].transform.position);
-        }
-
-        if (plains.Count > 0)
-        {
-            for (int i = 0; i < plains.Count; i++)
-            {
-                if (plains[i] != null)
-                {
-                    plains[i].gameObject.GetComponent<mouseEvents>().allowChange = true;
-                    plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
-                }
-            }
-        }
-    }
-
     void changeTileType()
     {
         if (dropDown.GetComponent<Dropdown>().options[dropDown.GetComponent<Dropdown>().value].text == "Select Road Type")
@@ -595,151 +538,37 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-    void createClutter()
+    void createLamps()
     {
-        float offsetYForLamp = 0.2f;
-
-        if(path.Count > 0)
+        if (m_allowLamps)
         {
-            if((path.Count % 2) != 0)
-            {
-                if (path[path.Count - 1].gameObject.tag == "Road")
-                {
-                    if (prevDirection == "left" || prevDirection == "right")
-                    {
-                        createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + offsetYForLamp, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z / 3.5f), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                        return;
-                    }
-                    else if (prevDirection == "up" || prevDirection == "down")
-                    {
-                        createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x / 3.5f, path[path.Count - 1].transform.position.y + offsetYForLamp, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                return;
-            }
-        }
-    }
+            float offsetYForLamp = 0.2f;
 
-    void removeSpawnedObjects()
-    {
-        if (currObj != null)
-        {
-
-            Collider[] hit = Physics.OverlapSphere(currObj.transform.localPosition, 1.5f);
-            if (hit.Length > 0)
+            if (path.Count > 0)
             {
-                for (int i = 0; i < hit.Length; i++)
+                if ((path.Count % 2) != 0)
                 {
-                    // If an intersection hits a lamp post then the lamp post is destroyed
-                    if (currObj.gameObject.tag == "Intersection")
+                    if (path[path.Count - 1].gameObject.tag == "Road")
                     {
-                        if (hit[i].gameObject.tag == "Lamp")
+                        if (prevDirection == "left" || prevDirection == "right")
                         {
-                            Destroy(hit[i].gameObject);
-
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x, path[path.Count - 1].transform.position.y + offsetYForLamp, path[path.Count - 1].transform.position.z - GetSize(path[path.Count - 1].gameObject).z / 3.5f), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            return;
+                        }
+                        else if (prevDirection == "up" || prevDirection == "down")
+                        {
+                            createTile(new Vector3(path[path.Count - 1].transform.position.x - GetSize(path[path.Count - 1].gameObject).x / 3.5f, path[path.Count - 1].transform.position.y + offsetYForLamp, path[path.Count - 1].transform.position.z), roadLamp, path[path.Count - 1].transform.rotation * roadLamp.transform.rotation, roadLamp.gameObject.tag);
+                            return;
                         }
                     }
                 }
+                else
+                {
+                    return;
+                }
             }
-            else
-            {
-                return;
-            }
         }
     }
-
-    public void switchCamera()
-    {
-        thisCamera.enabled = false;
-        player.SetActive(true);
-        playerCam.enabled = true;
-        Cursor.lockState = CursorLockMode.Locked;
-
-    }
-
-    //Testing functions (NOT PERMANANT)
-    void RampUp()
-    {
-        if (prevDirection == "right")
-        {
-            placementPosition.x += (GetSize(ramp).x);
-            startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-            createTile(placementPosition, ramp, Quaternion.identity,ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-        }
-
-        if (prevDirection == "left")
-        {
-            placementPosition.x -= (GetSize(ramp).x);
-            startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-            createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0), ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-        }
-
-        if (prevDirection == "up")
-        {
-            placementPosition.z += (GetSize(ramp).z);
-            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-            createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0), ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-        }
-
-        if (prevDirection == "down")
-        {
-            placementPosition.z -= (GetSize(ramp).z);
-            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
-            createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0), ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
-        }
-    }
-
-    void RampDown()
-    {
-        if (prevDirection == "right")
-        {
-            placementPosition.x += (GetSize(ramp).x);
-            startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-            createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0), ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-        }
-
-        if (prevDirection == "left")
-        {
-            placementPosition.x -= (GetSize(ramp).x);
-            startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-            createTile(placementPosition, ramp, Quaternion.identity, ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-        }
-
-        if (prevDirection == "up")
-        {
-            placementPosition.z += (GetSize(ramp).z);
-            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-            createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0),ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-        }
-
-        if (prevDirection == "down")
-        {
-            placementPosition.z -= (GetSize(ramp).z);
-            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
-            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
-            createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0), ramp.gameObject.tag);
-            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
-        }
-    }
-    
 
     public void createBlank()
     {
@@ -817,13 +646,12 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-
-    void spawnTrees(Vector3 startPlainPos,float x, float y, int i, int k)
+    void spawnTrees(Vector3 startPlainPos,float x, float y, int i, int k,int chance)
     {
         float p = 0.4f;
 
         int num = Random.Range(0, 100);
-        if (num < TreeSpawnChance)
+        if (num < chance)
         {
             GameObject treeTemp = Instantiate(tree, track.transform);
             treeTemp.transform.localPosition = new Vector3(startPlainPos.x - x * i - Random.RandomRange(-p, p) * x,
@@ -833,12 +661,12 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-    void spawnRocks(Vector3 startPlainPos, float x, float y, int i, int k)
+    void spawnRocks(Vector3 startPlainPos, float x, float y, int i, int k, int chance)
     {
         float p = 0.4f;
 
         int num = Random.Range(0, 100);
-        if (num < TreeSpawnChance)
+        if (num < chance)
         {
             GameObject treeTemp = Instantiate(Rock, track.transform);
             treeTemp.transform.localPosition = new Vector3(startPlainPos.x - x * i - Random.RandomRange(-p, p) * x,
@@ -848,12 +676,12 @@ public class TiledRoadCreator : MonoBehaviour
         }
     }
 
-    void spawnGrass(Vector3 startPlainPos, float x, float y, int i, int k)
+    void spawnGrass(Vector3 startPlainPos, float x, float y, int i, int k, int chance)
     {
         float p = 0.4f;
 
         int num = Random.Range(0, 100);
-        if (num < TreeSpawnChance)
+        if (num < chance)
         {
             GameObject treeTemp = Instantiate(Grass, track.transform);
             treeTemp.transform.localPosition = new Vector3(startPlainPos.x - x * i - Random.RandomRange(-p, p) * x,
@@ -864,7 +692,7 @@ public class TiledRoadCreator : MonoBehaviour
     }
 
 
-    void scatter(Vector3 startPlainPos)
+    public void scatter(Vector3 startPlainPos,string type,int chance)
     {
         float w = gridX * GetSize(grassTile).x;
         float h = gridZ * GetSize(grassTile).z;
@@ -876,37 +704,136 @@ public class TiledRoadCreator : MonoBehaviour
         {
             for (int k = 0; k < (gridZ); k++)
             {
-                spawnTrees(startPlainPos, x, y, i, k);
-                spawnRocks(startPlainPos, x, y, i, k);
-                spawnGrass(startPlainPos, x, y, i, k);
-                spawnGrass(startPlainPos, x, y, i, k);
+                if(type == "TREES")
+                {
+                    spawnTrees(startPlainPos, x, y, i, k,chance);
+                }
+                if (type == "ROCKS")
+                {
+                    spawnRocks(startPlainPos, x, y, i, k, chance);
+                }
+                if (type == "GRASS")
+                {
+                    spawnGrass(startPlainPos, x, y, i, k, chance);
+                }
             }
         }
 
 
     }
 
+    public void deleteFromWorld(string typeToDelete)
+    {
+        foreach (Transform t in track.transform)
+        {
+            if (typeToDelete == "TREES")
+            {
+                if (t.name.Contains("tree"))
+                {
+                    Destroy(t.gameObject);
+                }
+            }
+            if (typeToDelete == "ROCKS")
+            {
+                if (t.name.Contains("Rock"))
+                {
+                    Destroy(t.gameObject);
+                }
+            }
+
+            if (typeToDelete == "GRASS")
+            {
+                if (t.name.Contains("Grass"))
+                {
+                    Destroy(t.gameObject);
+                }
+            }
+        }
+    }
+
+    public void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    //Testing functions (NOT PERMANANT)
+    void RampUp()
+    {
+        if (prevDirection == "right")
+        {
+            placementPosition.x += (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.identity, ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
+
+        if (prevDirection == "left")
+        {
+            placementPosition.x -= (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
+
+        if (prevDirection == "up")
+        {
+            placementPosition.z += (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
+
+        if (prevDirection == "down")
+        {
+            placementPosition.z -= (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y / 5.5f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + (GetSize(ramp).y - GetSize(straightRoad).y / 2);
+        }
+    }
+
+    void RampDown()
+    {
+        if (prevDirection == "right")
+        {
+            placementPosition.x += (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x + GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 180, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
+
+        if (prevDirection == "left")
+        {
+            placementPosition.x -= (GetSize(ramp).x);
+            startPoint = new Vector3(placementPosition.x - GetSize(ramp).x, placementPosition.y, placementPosition.z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.identity, ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
+
+        if (prevDirection == "up")
+        {
+            placementPosition.z += (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z + GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 90, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
+
+        if (prevDirection == "down")
+        {
+            placementPosition.z -= (GetSize(ramp).z);
+            startPoint = new Vector3(placementPosition.x, placementPosition.y, placementPosition.z - GetSize(ramp).z);
+            placementPosition.y = placementPosition.y - (GetSize(ramp).y * 0.82f);
+            createTile(placementPosition, ramp, Quaternion.Euler(0, 270, 0), ramp.gameObject.tag);
+            placementPosition.y = placementPosition.y + GetSize(straightRoad).y / 2;
+        }
+    }
+
 
 }
-////////
-//TODO:
-// // Delete Duplicate tiles 
-// // Possibly move lamp and tree creation to seperate functions to alleviate the code base in here
-////////
-///
-/// line 101
-//
-//if(started == true)
-//{
-//    if(plains.Count > 0)
-//    {
-//        for(int i = 0; i < plains.Count; i++)
-//        {
-//            if (plains[i] != null)
-//            {
-//                plains[i].gameObject.GetComponent<mouseEvents>().allowChange = false;
-//                plains[i].gameObject.GetComponent<mouseEvents>().revertToOrgColor();
-//            }
-//        }
-//    }
-//}

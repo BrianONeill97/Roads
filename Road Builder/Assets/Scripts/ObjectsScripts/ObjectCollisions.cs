@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class ObjectCollisions : MonoBehaviour
 {
+    public Color m_originalColor;
+    private void Awake()
+    {
+        m_originalColor = GetComponent<Renderer>().material.color;
+    }
     private void OnCollisionEnter(Collision other)
     {
+        //TREES
         if (gameObject.CompareTag("Tree"))
         {
             if (other.gameObject.CompareTag("House"))
@@ -33,7 +39,7 @@ public class ObjectCollisions : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-
+        //HOUSE
         if(gameObject.CompareTag("House"))
         {
             if(other.gameObject.CompareTag("House"))
@@ -51,7 +57,7 @@ public class ObjectCollisions : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-
+        //WATER
         if (gameObject.CompareTag("Wave"))
         {
             if (other.gameObject.CompareTag("Wave"))
@@ -70,10 +76,42 @@ public class ObjectCollisions : MonoBehaviour
                 Destroy(other.gameObject);
             }
         }
+        //ROCKS
+        if (gameObject.CompareTag("Rock"))
+        {
+            if(other.gameObject.CompareTag("Tree"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("House"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("Road"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("Corner"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("Intersection"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("TJunction"))
+            {
+                Destroy(gameObject);
+            }
+        }
 
 
-
-        if (other.gameObject.CompareTag("TJunction"))
+            if (other.gameObject.CompareTag("TJunction"))
         {
             Destroy(gameObject);
         }

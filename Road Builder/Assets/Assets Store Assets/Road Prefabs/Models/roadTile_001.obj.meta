@@ -11,7 +11,12 @@ ModelImporter:
     2300000: Mesh1_Group1_Model
     3300000: Mesh1_Group1_Model
     4300000: Mesh1_Group1_Model
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Water
+    second: {fileID: 2100004, guid: 334444d3716090249b86ba84706239d6, type: 3}
   materials:
     importMaterials: 1
     materialName: 0

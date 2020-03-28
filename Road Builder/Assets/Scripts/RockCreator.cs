@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RockCreator : MonoBehaviour
 {
-    int seed = 0;
+    int seed;
     private Material mat;
     private List<Vector3> vertices = new List<Vector3>();
     private List<Vector3> completeVerts = new List<Vector3>();
@@ -12,12 +12,12 @@ public class RockCreator : MonoBehaviour
     private Vector3 center;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        seed = Random.Range(100, 200000);
-        Debug.Log(seed);
+        transform.localScale = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
+        seed = Random.Range(1, 200000);
         Random.InitState(seed);
-        float offset = Random.Range(0, 20);
+        float offset = Random.Range(1, 200000);
 
         Mesh mesh = GetComponent<MeshFilter>().mesh;
 
@@ -42,7 +42,7 @@ public class RockCreator : MonoBehaviour
             {
                 Vector3 curVector = vertices[v];
                 completeVerts.Add(curVector);
-                int smoothing = Random.Range(4, 6);
+                int smoothing = Random.Range(2, 10);
                 Vector3 changedVector = (curVector - ((curVector - center) * (Mathf.PerlinNoise(((float)v / offset) / smoothing, (float)v / offset) / smoothing)));
                 for (int s = 0; s < vertices.Count; s++)
                 {

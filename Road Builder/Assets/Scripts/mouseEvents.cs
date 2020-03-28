@@ -7,7 +7,6 @@ public class mouseEvents : MonoBehaviour
     private Color start;
     public bool allowChange = true;
     public bool selected = false;
-    bool createRiver = false;
 
     private void Awake()
     {

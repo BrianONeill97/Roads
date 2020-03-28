@@ -94,8 +94,7 @@ public class Builder : MonoBehaviour
             }
             else
             {
-                firstRoofSide(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z));
-                secondRoofSide(new Vector3(pos.x, pos.y + i * GetSize(wall).y, pos.z));
+
             }
         }
 
@@ -177,113 +176,6 @@ public class Builder : MonoBehaviour
             }
         }
     }
-
-    void createRoof(Vector3 pos)
-    {
-        float yOffset = 0.725f;
-        for (int i = 0; i < xSize; i++)
-        {
-
-            for (int z = 0; z < zSize; z++)
-            {                
-                if(xSize % 2 ==0) // Its even
-                {
-                    // Upwards Side
-                    if (i < xSize / 2)
-                    {
-                        GameObject tile = Instantiate(roof, building.transform);
-                        tile.transform.localPosition = new Vector3(i * GetSize(floor).x + -GetSize(floor).x,  // offset it to the top of the wall
-                                                                    pos.y + (yOffset * i),
-                                                                    (z * GetSize(floor).z) - GetSize(floor).z); // (currentTile * size of the floor tile(spacing)) - offset to center the 3 tiles
-                        tile.transform.localRotation = Quaternion.Euler(0, 90, 0);
-                        roofTiles.Add(tile);
-                    }
-                    else // Downwards side
-                    {
-                        GameObject tile = Instantiate(roof, building.transform);
-                        tile.transform.localPosition = new Vector3(i * GetSize(floor).x + -GetSize(floor).x,  // offset it to the top of the wall
-                                                                    pos.y,
-                                                                    (z * GetSize(floor).z) - GetSize(floor).z); // (currentTile * size of the floor tile(spacing)) - offset to center the 3 tiles
-                        tile.transform.localRotation = Quaternion.Euler(0, 270, 0);
-                        roofTiles.Add(tile);
-                    }
-                }
-                else // its odd
-                {
-                    //Upwards Side
-                    if (i < (xSize / 2))
-                    {
-                        GameObject tile = Instantiate(roof, building.transform);
-                        tile.transform.localPosition = new Vector3(i * GetSize(floor).x + -GetSize(floor).x,  // offset it to the top of the wall
-                                                                    pos.y,
-                                                                    (z * GetSize(floor).z) - GetSize(floor).z); // (currentTile * size of the floor tile(spacing)) - offset to center the 3 tiles
-                        tile.transform.localRotation = Quaternion.Euler(0, 90, 0);
-                        roofTiles.Add(tile);
-                    }
-
-                    // Top Part
-                    if (i == (xSize / 2))
-                    {
-                        GameObject tile = Instantiate(floor, building.transform);
-                        tile.transform.localPosition = new Vector3(i * GetSize(floor).x + -GetSize(floor).x,  // offset it to the top of the wall
-                                                                    pos.y + 0.625f, // position + height of a wall
-                                                                    (z * GetSize(floor).z) - GetSize(floor).z); // (currentTile * size of the floor tile(spacing)) - offset to center the 3 tiles
-                        tile.transform.localRotation = Quaternion.Euler(0, 180, 0);
-                        roofTiles.Add(tile);
-                    }
-
-                    //Downwards Side
-                    if (i >= (xSize / 2) + 1.0f) // rotate to the other
-                    {
-                        GameObject tile = Instantiate(roof, building.transform);
-                        tile.transform.localPosition = new Vector3(i * GetSize(floor).x + -GetSize(floor).x,  // offset it to the top of the wall
-                                                                    pos.y,
-                                                                    (z * GetSize(floor).z) - GetSize(floor).z); // (currentTile * size of the floor tile(spacing)) - offset to center the 3 tiles
-                        tile.transform.localRotation = Quaternion.Euler(0, 270, 0);
-                        roofTiles.Add(tile); 
-                    }
-                }            
-            }
-        }
-    }
-
-    void firstRoofSide(Vector3 pos)
-    {
-        float offset = 0.725f;
-        Vector3 StartingPosition = new Vector3(-GetSize(floor).x * 1.5f, pos.y, -GetSize(floor).z * 1.5f);
-
-        int newSizeX = xSize + 1;
-        int newSizeZ = zSize + 1;
-
-        for (int x = 0; x < newSizeX /2; x++)
-        {
-            for (int z = 0; z < newSizeZ; z++)
-            {
-                        GameObject tile = Instantiate(roof, building.transform);
-                        tile.transform.localPosition = new Vector3( StartingPosition.x + (x * GetSize(floor).x),
-                                                                    StartingPosition.y + (x * offset),
-                                                                    StartingPosition.z + (z * GetSize(floor).z));
-                        tile.transform.localRotation = Quaternion.Euler(0, 90, 0);
-                        roofTiles.Add(tile);
-            }
-        }
-    }
-
-    void secondRoofSide(Vector3 pos)
-    {
-        for (int i = 0; i < xSize; i++)
-        {
-            for (int z = 0; z < zSize; z++)
-            {
-                GameObject tile = Instantiate(floor, building.transform);
-                tile.transform.localPosition = new Vector3((i * GetSize(floor).x) - GetSize(floor).x, pos.y, z * GetSize(floor).z - GetSize(floor).z);//new Vector3((i * GetSize(floor).x), pos.y, z * GetSize(floor).z);
-                tile.transform.localRotation = Quaternion.identity;
-                floorTiles.Add(tile);
-            }
-        }
-
-    }
-    
 
     public Vector3 GetSize(GameObject obj)
     {

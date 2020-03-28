@@ -103,7 +103,7 @@ public class LakeCreation : MonoBehaviour
                 {
                     Destroy(water[i].gameObject);
                     water.RemoveAt(i);
-                    Debug.Log("Removing Tile Outside bounds");
+                    //Debug.Log("Removing Tile Outside bounds");
                 }
             }
         }

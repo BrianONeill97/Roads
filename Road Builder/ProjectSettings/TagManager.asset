@@ -18,6 +18,7 @@ TagManager:
   - Floor
   - Wall
   - Door
+  - Rock
   layers:
   - Default
   - TransparentFX
