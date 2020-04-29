@@ -619,13 +619,14 @@ public class TiledRoadCreator : MonoBehaviour
                 return;
             }
 
-            // Checks if the object thats been hit is a corner
+            // Checks if the object thats been hit is a corner ( still creates as this is where an intersection is made)
             if (hit[0].gameObject.tag == "Corner")
             {
                 rot = q;
                 GameObject objectC = Instantiate(obj, m_roads.transform);
                 objectC.transform.localPosition = location;
                 objectC.transform.localRotation = q;
+                // ONly adds to the path if its a tile
                 if (tileTag != "Lamp")
                 {
                     path.Add(objectC);
@@ -635,12 +636,13 @@ public class TiledRoadCreator : MonoBehaviour
                 return;
             }
 
-            // checks the current tile 
+            // checks the current tile  and if its a road tile
             if (tileTag == "Road")
             {
                 // checks the object i just hit, Check if its rotation is the same and if it is then dont make another one
                 if (hit[0].gameObject.tag != "Plain")
                 {
+                    //this lets me make the bridge
                     if (hit[0].gameObject.tag == "Wave")
                     {
                         rot = q;
@@ -648,14 +650,10 @@ public class TiledRoadCreator : MonoBehaviour
                         objectC.transform.localPosition = location;
                         objectC.transform.localRotation = q;
                     }
-                    else if(hit[0].transform.localRotation == q)
+                    else if(hit[0].transform.localRotation == q) // if the rotation is the same then just leave the function
                     {
                         return;
                     }
-                    //if (hit[0].transform.localRotation == q)
-                    //{
-                    //    return;
-                    //}
                     else // otherwise create a new one( this is where the intersection is made )
                     {
                         rot = q;
@@ -670,7 +668,7 @@ public class TiledRoadCreator : MonoBehaviour
                         }
                     }             
                 }
-                else
+                else // if i just hit a plain object
                 {
                     rot = q;
                     GameObject objectC = Instantiate(obj, m_roads.transform);

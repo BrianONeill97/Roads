@@ -26,7 +26,6 @@ public class Wave : MonoBehaviour
     void Update()
     {
         wave();
-        setBlend();
     }
 
     MeshFilter makeMeshLowPoly(MeshFilter mf)
@@ -49,27 +48,6 @@ public class Wave : MonoBehaviour
         return mf;
     }
 
-    void setBlend()
-    {
-        //if(!SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.Depth))
-        //{
-        //    Blend = false;
-        //}
-
-        //if(Blend)
-        //{
-        //    Shader.EnableKeyword("WATER_BLEND_ON");
-        //    if(Camera.main)
-        //    {
-        //        Camera.main.depthTextureMode |= DepthTextureMode.Depth;
-        //    }
-        //}
-        //else
-        //{
-        //    Shader.DisableKeyword("WATER_BLEND_ON");
-        //}
-    }
-
     void wave()
     {
         for(int i = 0; i < verts.Length; i++)
@@ -78,7 +56,7 @@ public class Wave : MonoBehaviour
             v.y = 0.0f;
             float dist = Vector3.Distance(v, waveSource1);
             dist = (dist % wavelength) / wavelength;
-            v.y = waveHeight * Mathf.Sin(Time.time * Mathf.PI * 2.0f * waveFrequency + (Mathf.PI * 2.0f * dist));
+            v.y = waveHeight * Mathf.Sin(Time.time * Mathf.PI * 2.0f * waveFrequency + (Mathf.PI * 2.0f * dist)); // moves the waves up and down 
             verts[i] = v;
         }
 
