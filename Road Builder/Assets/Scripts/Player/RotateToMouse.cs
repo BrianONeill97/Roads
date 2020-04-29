@@ -6,8 +6,6 @@ public class RotateToMouse : MonoBehaviour
 {
     public Camera myCamera;
     private Vector3 MousePositionViewport = Vector3.zero;
-    private Quaternion DesiredRotation = new Quaternion();
-    private float RotationSpeed = 2;
     // Update is called once per frame
     private void Update()
     {
