@@ -41,9 +41,14 @@ public class TEst : MonoBehaviour
     public Vector2Int Size;
     Vector3 position;
 
+    // Colors 
+    private Color m_originalColor;
+    private Color m_colorOfHouse;
+
 
     private void Awake()
     {
+        m_originalColor = new Color(255,255,255,255);
         wall = Resources.Load("BuildingParts/Wall") as GameObject;
         floor = Resources.Load("BuildingParts/Cube") as GameObject;
         roof = Resources.Load("BuildingParts/Roof") as GameObject;
@@ -1067,9 +1072,9 @@ public class TEst : MonoBehaviour
         building.AddComponent<BoxCollider>();
         building.GetComponent<BoxCollider>().center = m_colliderCentre;
 
-        building.GetComponent<BoxCollider>().size = new Vector3((Size.x * Utility.GetSize(floor).x) - 0.5f,
+        building.GetComponent<BoxCollider>().size = new Vector3((Size.x * Utility.GetSize(floor).x),
                                                                     Floors * Utility.GetSize(wall).y + 0.5f,
-                                                                    (Size.y * Utility.GetSize(floor).z) - 0.5f
+                                                                    (Size.y * Utility.GetSize(floor).z)
                                                                );
         building.layer = LayerMask.NameToLayer("BuildingLayer");
 
@@ -1102,6 +1107,10 @@ public class TEst : MonoBehaviour
         garden.GetComponent<Rigidbody>().isKinematic = false;
         garden.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         garden.tag = "Garden";
+        if (SceneManager.GetActiveScene().name != "Building")
+        {
+            garden.AddComponent<ObjectCollisions>();
+        }
     }
     void EmptyLists()
     {

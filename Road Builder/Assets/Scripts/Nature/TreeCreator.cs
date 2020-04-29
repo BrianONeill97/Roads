@@ -98,7 +98,7 @@ public class TreeCreator : MonoBehaviour
         List<Vector3> tempPoints = new List<Vector3>();
 
         tempPoints.Add(new Vector3(GetComponent<SelectBox>().m_centre.x,0, GetComponent<SelectBox>().m_centre.z));
-        while(m_currentTreeCountForBox < GetComponent<SelectBox>().m_area / 3000)
+        while(m_currentTreeCountForBox < GetComponent<SelectBox>().m_area / 2000)
         {
             int spawnIndex = Random.Range(0, tempPoints.Count);
             Vector3 spawnCentre = tempPoints[spawnIndex];
