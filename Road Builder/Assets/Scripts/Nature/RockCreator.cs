@@ -20,6 +20,8 @@ public class RockCreator : MonoBehaviour
 
     private void Start()
     {
+        m_allowCreation = false;
+
         RocksContainer = new GameObject("RocksContainer");
         RocksContainer.transform.SetParent(GameObject.Find("Track").transform);
     }

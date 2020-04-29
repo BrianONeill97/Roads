@@ -22,6 +22,8 @@ public class GrassCreator : MonoBehaviour
 
     private void Start()
     {
+        m_allowCreation = false;
+
         GrassContainer = new GameObject("GrassContainer");
         GrassContainer.transform.SetParent(GameObject.Find("Track").transform);
     }

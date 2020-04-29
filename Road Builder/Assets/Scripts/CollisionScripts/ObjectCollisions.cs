@@ -7,16 +7,15 @@ public class ObjectCollisions : MonoBehaviour
 {
     public int count;
 
-    private void Start()
-    {
-        count = 0;
-    }
 
     private void OnCollisionEnter(Collision other)
     {
-        if(!other.gameObject.CompareTag(gameObject.tag))
+        if (!gameObject.CompareTag("Wave"))
         {
-            count++;
+            if (other.gameObject.CompareTag("BoundingTags"))
+            {
+                Destroy(gameObject);
+            }
         }
         
         //TREES
@@ -69,10 +68,19 @@ public class ObjectCollisions : MonoBehaviour
             {
                 Destroy(gameObject);
             }
+
+            if (other.gameObject.CompareTag("Garden"))
+            {
+                Destroy(other.gameObject);
+            }
         }
         //WATER
         if (gameObject.CompareTag("Wave"))
         {
+            if (other.gameObject.CompareTag("Garden"))
+            {
+                Destroy(other.gameObject);
+            }
             if (other.gameObject.CompareTag("Wave"))
             {
                 if (Mathf.Approximately(other.gameObject.transform.position.x, transform.position.x) && Mathf.Approximately(other.gameObject.transform.position.y, transform.position.y) && Mathf.Approximately(other.gameObject.transform.position.z, transform.position.z))
@@ -149,6 +157,50 @@ public class ObjectCollisions : MonoBehaviour
             }
         }
 
+
+        //Grass
+        if (gameObject.CompareTag("Grass"))
+        {
+            if (other.gameObject.CompareTag("House"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("Road"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("Corner"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("Intersection"))
+            {
+                Destroy(gameObject);
+            }
+
+            if (other.gameObject.CompareTag("TJunction"))
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        // Garden
+        if(gameObject.CompareTag("Garden"))
+        {
+            if (other.gameObject.CompareTag("BoundingTags"))
+            {
+                Destroy(gameObject);
+            }
+            if (other.gameObject.CompareTag("Garden"))
+            {
+                Destroy(gameObject);
+            }
+        }
+
+
         if (other.gameObject.CompareTag("TJunction"))
         {
             Destroy(gameObject);
@@ -157,26 +209,6 @@ public class ObjectCollisions : MonoBehaviour
         if (other.gameObject.CompareTag("Intersection"))
         {
             Destroy(gameObject);
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        count--;
-    }
-
-    private void Update()
-    {
-        if (SceneManager.GetActiveScene().name == "Road Drawing")
-        {
-            if (!gameObject.CompareTag("Wave"))
-            {
-                if (count <= 0)
-                {
-                    Destroy(gameObject);
-                    count = 0;
-                }
-            }
         }
     }
 }

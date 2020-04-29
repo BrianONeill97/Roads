@@ -23,6 +23,8 @@ TagManager:
   - petal
   - Leaf
   - Garden
+  - BoundingTags
+  - Grass
   layers:
   - Default
   - TransparentFX
